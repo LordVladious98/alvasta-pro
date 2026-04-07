@@ -23,7 +23,10 @@
  */
 
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import { platform } from "node:os";
+import { mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { platform, tmpdir, homedir } from "node:os";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { StreamFn } from "@mariozechner/pi-agent-core";
 import {
   createEmptyTransportUsage,
@@ -35,6 +38,33 @@ import {
 } from "./transport-stream-shared.js";
 
 const IS_WINDOWS = platform() === "win32";
+
+// Resolve the absolute path to the Alvasta MCP bridge so we can pass it to
+// Claude Code's --mcp-config. The bridge exposes openclaw's native tools as
+// MCP-protocol tools that the spawned Claude Code subprocess can call.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ALVASTA_BRIDGE_PATH = resolve(__dirname, "alvasta-mcp-bridge.mjs");
+
+/**
+ * Write (idempotently) the .mcp.json config that tells Claude Code to load
+ * the Alvasta MCP bridge as a stdio MCP server. Returns the config path.
+ */
+function writeAlvastaMcpConfig(): string {
+  const dir = resolve(homedir(), ".alvasta-pro");
+  mkdirSync(dir, { recursive: true });
+  const path = resolve(dir, "alvasta-mcp.json");
+  const config = {
+    mcpServers: {
+      alvasta: {
+        type: "stdio",
+        command: process.execPath, // current node binary
+        args: [ALVASTA_BRIDGE_PATH],
+      },
+    },
+  };
+  writeFileSync(path, JSON.stringify(config, null, 2));
+  return path;
+}
 
 type TransportContentBlock =
   | { type: "text"; text: string; index: number }
@@ -110,7 +140,19 @@ function runClaudeStream(params: {
 }): Promise<void> {
   const { inputLines, systemPrompt, resumeSessionId, signal, onEvent, onClaudeSessionId } = params;
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolvePromise, reject) => {
+    // Ensure the Alvasta MCP bridge config exists; pass it to Claude Code
+    // via --mcp-config so the spawned subprocess can call openclaw's tools.
+    let mcpConfigPath: string | null = null;
+    try {
+      if (existsSync(ALVASTA_BRIDGE_PATH)) {
+        mcpConfigPath = writeAlvastaMcpConfig();
+      }
+    } catch {
+      // If we can't write the config, continue without the bridge — Claude Code
+      // will still work with its built-in tools.
+    }
+
     const args = [
       "--print",
       "--input-format", "stream-json",
@@ -119,6 +161,9 @@ function runClaudeStream(params: {
       "--dangerously-skip-permissions",
       "--system-prompt", systemPrompt,
     ];
+    if (mcpConfigPath) {
+      args.push("--mcp-config", mcpConfigPath);
+    }
     if (resumeSessionId) {
       args.push("--resume", resumeSessionId);
     }
@@ -162,7 +207,7 @@ function runClaudeStream(params: {
 
     child.on("exit", (code: number | null, sig: NodeJS.Signals | null) => {
       if (code === 0) {
-        resolve();
+        resolvePromise();
       } else {
         reject(
           new Error(
