@@ -28,6 +28,7 @@ import { platform, tmpdir, homedir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { StreamFn } from "@mariozechner/pi-agent-core";
+import { ensureAlvastaToolHostStarted } from "./alvasta-tool-host.js";
 import {
   createEmptyTransportUsage,
   createWritableTransportEventStream,
@@ -140,40 +141,61 @@ function runClaudeStream(params: {
 }): Promise<void> {
   const { inputLines, systemPrompt, resumeSessionId, signal, onEvent, onClaudeSessionId } = params;
 
-  return new Promise((resolvePromise, reject) => {
-    // Ensure the Alvasta MCP bridge config exists; pass it to Claude Code
-    // via --mcp-config so the spawned subprocess can call openclaw's tools.
-    let mcpConfigPath: string | null = null;
+  // Make this async so we can start the tool host before spawning claude.
+  // Wrapped in an outer async IIFE that returns the same Promise.
+  return (async () => {
+    // Ensure the Alvasta tool host is running so the bridge has a manifest
+    // to read. Failures here are non-fatal — the bridge falls back to its
+    // hardcoded test tools.
+    let manifestPath: string | null = null;
     try {
-      if (existsSync(ALVASTA_BRIDGE_PATH)) {
-        mcpConfigPath = writeAlvastaMcpConfig();
-      }
+      manifestPath = await ensureAlvastaToolHostStarted();
     } catch {
-      // If we can't write the config, continue without the bridge — Claude Code
-      // will still work with its built-in tools.
+      // continue without live tools
     }
 
-    const args = [
-      "--print",
-      "--input-format", "stream-json",
-      "--output-format", "stream-json",
-      "--verbose", // required by Claude Code with stream-json output
-      "--dangerously-skip-permissions",
-      "--system-prompt", systemPrompt,
-    ];
-    if (mcpConfigPath) {
-      args.push("--mcp-config", mcpConfigPath);
-    }
-    if (resumeSessionId) {
-      args.push("--resume", resumeSessionId);
-    }
+    return new Promise<void>((resolvePromise, reject) => {
+      // Ensure the Alvasta MCP bridge config exists; pass it to Claude Code
+      // via --mcp-config so the spawned subprocess can call openclaw's tools.
+      let mcpConfigPath: string | null = null;
+      try {
+        if (existsSync(ALVASTA_BRIDGE_PATH)) {
+          mcpConfigPath = writeAlvastaMcpConfig();
+        }
+      } catch {
+        // If we can't write the config, continue without the bridge — Claude Code
+        // will still work with its built-in tools.
+      }
 
-    const child: ChildProcessWithoutNullStreams = spawn("claude", args, {
-      stdio: ["pipe", "pipe", "pipe"],
-      shell: IS_WINDOWS,
-      windowsHide: true,
-      signal,
-    });
+      const args = [
+        "--print",
+        "--input-format", "stream-json",
+        "--output-format", "stream-json",
+        "--verbose", // required by Claude Code with stream-json output
+        "--dangerously-skip-permissions",
+        "--system-prompt", systemPrompt,
+      ];
+      if (mcpConfigPath) {
+        args.push("--mcp-config", mcpConfigPath);
+      }
+      if (resumeSessionId) {
+        args.push("--resume", resumeSessionId);
+      }
+
+      // Build the env for the child. Pass ALVASTA_TOOL_MANIFEST so the bridge
+      // (spawned as a sub-child by claude) can read the live tool registry.
+      const childEnv = { ...process.env };
+      if (manifestPath) {
+        childEnv.ALVASTA_TOOL_MANIFEST = manifestPath;
+      }
+
+      const child: ChildProcessWithoutNullStreams = spawn("claude", args, {
+        stdio: ["pipe", "pipe", "pipe"],
+        shell: IS_WINDOWS,
+        windowsHide: true,
+        signal,
+        env: childEnv,
+      });
 
     let lineBuffer = "";
     let stderrBuffer = "";
@@ -217,12 +239,13 @@ function runClaudeStream(params: {
       }
     });
 
-    // Send all user messages as a single stdin write, then close
-    for (const line of inputLines) {
-      child.stdin.write(line + "\n");
-    }
-    child.stdin.end();
-  });
+      // Send all user messages as a single stdin write, then close
+      for (const line of inputLines) {
+        child.stdin.write(line + "\n");
+      }
+      child.stdin.end();
+    });
+  })();
 }
 
 /**
