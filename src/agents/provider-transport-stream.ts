@@ -1,6 +1,7 @@
 import type { StreamFn } from "@mariozechner/pi-agent-core";
 import type { Api, Model } from "@mariozechner/pi-ai";
 import { createAnthropicMessagesTransportStreamFn } from "./anthropic-transport-stream.js";
+import { createClaudeCodeTransportStreamFn } from "./claude-code-transport-stream.js";
 import { createGoogleGenerativeAiTransportStreamFn } from "./google-transport-stream.js";
 import {
   createAzureOpenAIResponsesTransportStreamFn,
@@ -8,6 +9,11 @@ import {
   createOpenAIResponsesTransportStreamFn,
 } from "./openai-transport-stream.js";
 import { getModelProviderRequestTransport } from "./provider-request-config.js";
+
+// Alvasta Pro: route ALL Anthropic inference through `claude --print` subprocess
+// instead of the Anthropic SDK. Inherits Claude Code OAuth, no API key needed.
+// Set ALVASTA_USE_SDK=1 to fall back to the original SDK path for debugging.
+const USE_CLAUDE_CODE_SUBPROCESS = process.env.ALVASTA_USE_SDK !== "1";
 
 const SUPPORTED_TRANSPORT_APIS = new Set<Api>([
   "openai-responses",
@@ -37,7 +43,9 @@ function createSupportedTransportStreamFn(api: Api): StreamFn | undefined {
     case "azure-openai-responses":
       return createAzureOpenAIResponsesTransportStreamFn();
     case "anthropic-messages":
-      return createAnthropicMessagesTransportStreamFn();
+      return USE_CLAUDE_CODE_SUBPROCESS
+        ? createClaudeCodeTransportStreamFn()
+        : createAnthropicMessagesTransportStreamFn();
     case "google-generative-ai":
       return createGoogleGenerativeAiTransportStreamFn();
     default:
