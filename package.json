@@ -1,19 +1,23 @@
 {
-  "name": "openclaw",
-  "version": "2026.4.6",
-  "description": "Multi-channel AI gateway with extensible messaging integrations",
-  "keywords": [],
-  "homepage": "https://github.com/openclaw/openclaw#readme",
+  "name": "@alvasta/pro",
+  "version": "0.6.0-alpha.1",
+  "description": "The Claude-faithful personal AI assistant. Forked from openclaw, rewired to use Claude Code OAuth via subprocess. Built in Melbourne by Alvasta IT Solutions.",
+  "keywords": ["claude", "claude-code", "alvasta", "personal-ai", "assistant", "openclaw-fork"],
+  "homepage": "https://github.com/LordVladious98/alvasta-pro#readme",
   "bugs": {
-    "url": "https://github.com/openclaw/openclaw/issues"
+    "url": "https://github.com/LordVladious98/alvasta-pro/issues"
   },
   "license": "MIT",
-  "author": "",
+  "author": "Alvasta IT Solutions <hello@alvasta.com.au>",
+  "contributors": [
+    "OpenClaw maintainers (upstream, MIT)"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openclaw/openclaw.git"
+    "url": "git+https://github.com/LordVladious98/alvasta-pro.git"
   },
   "bin": {
+    "alvasta-pro": "openclaw.mjs",
     "openclaw": "openclaw.mjs"
   },
   "directories": {
