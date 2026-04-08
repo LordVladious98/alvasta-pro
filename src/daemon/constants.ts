@@ -1,6 +1,20 @@
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
-// Default service labels (canonical + legacy compatibility)
+// Default service labels.
+//
+// v0.6 rebranding note: the canonical strings below are still the openclaw
+// names because they're hardcoded in ~20 test files and renaming them would
+// cascade through the entire daemon test suite. Instead, we EXPORT the
+// Alvasta Pro alternatives alongside as ALVASTA_PRO_* constants. Future
+// versions can:
+//   1. Register BOTH labels with systemd/launchd/Task Scheduler so either
+//      name works during the transition period
+//   2. Prefer the Alvasta Pro labels for NEW installs (env-var opt-in)
+//   3. Eventually make ALVASTA_PRO_* the canonical and push openclaw into
+//      the LEGACY_* arrays
+//
+// Don't rename GATEWAY_LAUNCH_AGENT_LABEL / GATEWAY_SYSTEMD_SERVICE_NAME /
+// GATEWAY_WINDOWS_TASK_NAME without auditing every test that imports them.
 export const GATEWAY_LAUNCH_AGENT_LABEL = "ai.openclaw.gateway";
 export const GATEWAY_SYSTEMD_SERVICE_NAME = "openclaw-gateway";
 export const GATEWAY_WINDOWS_TASK_NAME = "OpenClaw Gateway";
@@ -15,6 +29,17 @@ export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
 export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS: string[] = [];
 export const LEGACY_GATEWAY_SYSTEMD_SERVICE_NAMES: string[] = ["clawdbot-gateway"];
 export const LEGACY_GATEWAY_WINDOWS_TASK_NAMES: string[] = [];
+
+// Alvasta Pro canonical labels — available for future wiring. Not yet active
+// in systemd.ts / launchd.ts / schtasks.ts because they still read the
+// constants above. Exposed as exports so production code can opt-in via
+// env var or config in subsequent phases.
+export const ALVASTA_PRO_GATEWAY_LAUNCH_AGENT_LABEL = "ai.alvasta-pro.gateway";
+export const ALVASTA_PRO_GATEWAY_SYSTEMD_SERVICE_NAME = "alvasta-pro-gateway";
+export const ALVASTA_PRO_GATEWAY_WINDOWS_TASK_NAME = "Alvasta Pro Gateway";
+export const ALVASTA_PRO_NODE_LAUNCH_AGENT_LABEL = "ai.alvasta-pro.node";
+export const ALVASTA_PRO_NODE_SYSTEMD_SERVICE_NAME = "alvasta-pro-node";
+export const ALVASTA_PRO_NODE_WINDOWS_TASK_NAME = "Alvasta Pro Node";
 
 export function normalizeGatewayProfile(profile?: string): string | null {
   const trimmed = profile?.trim();
