@@ -1,15 +1,15 @@
 ---
 title: "fal"
-summary: "fal image and video generation setup in OpenClaw"
+summary: "fal image and video generation setup in Alvasta Pro"
 read_when:
-  - You want to use fal image generation in OpenClaw
+  - You want to use fal image generation in Alvasta Pro
   - You need the FAL_KEY auth flow
   - You want fal defaults for image_generate or video_generate
 ---
 
 # fal
 
-OpenClaw ships a bundled `fal` provider for hosted image and video generation.
+Alvasta Pro ships a bundled `fal` provider for hosted image and video generation.
 
 - Provider: `fal`
 - Auth: `FAL_KEY` (canonical; `FAL_API_KEY` also works as a fallback)
@@ -20,7 +20,7 @@ OpenClaw ships a bundled `fal` provider for hosted image and video generation.
 1. Set the API key:
 
 ```bash
-openclaw onboard --auth-choice fal-api-key
+alvasta-pro onboard --auth-choice fal-api-key
 ```
 
 2. Set a default image model:

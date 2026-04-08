@@ -9,7 +9,7 @@ title: "Webhooks Plugin"
 # Webhooks (plugin)
 
 The Webhooks plugin adds authenticated HTTP routes that bind external
-automation to OpenClaw TaskFlows.
+automation to Alvasta Pro TaskFlows.
 
 Use it when you want a trusted system such as Zapier, n8n, a CI job, or an
 internal service to create and drive managed TaskFlows without writing a custom
@@ -96,7 +96,7 @@ The plugin applies:
 Send `POST` requests with:
 
 - `Content-Type: application/json`
-- `Authorization: Bearer <secret>` or `x-openclaw-webhook-secret: <secret>`
+- `Authorization: Bearer <secret>` or `x-alvasta-pro-webhook-secret: <secret>`
 
 Example:
 

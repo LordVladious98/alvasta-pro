@@ -21,10 +21,10 @@ agent (with a session switcher for other sessions).
 - Auto‑open for testing:
 
   ```bash
-  dist/OpenClaw.app/Contents/MacOS/OpenClaw --webchat
+  dist/Alvasta Pro.app/Contents/MacOS/Alvasta Pro --webchat
   ```
 
-- Logs: `./scripts/clawlog.sh` (subsystem `ai.openclaw`, category `WebChatSwiftUI`).
+- Logs: `./scripts/clawlog.sh` (subsystem `ai.alvasta-pro`, category `WebChatSwiftUI`).
 
 ## How it is wired
 

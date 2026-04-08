@@ -1,14 +1,14 @@
 ---
-summary: "ClawDock shell helpers for Docker-based OpenClaw installs"
+summary: "ClawDock shell helpers for Docker-based Alvasta Pro installs"
 read_when:
-  - You run OpenClaw with Docker often and want shorter day-to-day commands
+  - You run Alvasta Pro with Docker often and want shorter day-to-day commands
   - You want a helper layer for dashboard, logs, token setup, and pairing flows
 title: "ClawDock"
 ---
 
 # ClawDock
 
-ClawDock is a small shell-helper layer for Docker-based OpenClaw installs.
+ClawDock is a small shell-helper layer for Docker-based Alvasta Pro installs.
 
 It gives you short commands like `clawdock-start`, `clawdock-dashboard`, and `clawdock-fix-token` instead of longer `docker compose ...` invocations.
 
@@ -19,7 +19,7 @@ If you have not set up Docker yet, start with [Docker](/install/docker).
 Use the canonical helper path:
 
 ```bash
-mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/openclaw/openclaw/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
+mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/alvasta-pro/alvasta-pro/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
 echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
@@ -42,7 +42,7 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | Command                   | Description                                   |
 | ------------------------- | --------------------------------------------- |
 | `clawdock-shell`          | Open a shell inside the gateway container     |
-| `clawdock-cli <command>`  | Run OpenClaw CLI commands in Docker           |
+| `clawdock-cli <command>`  | Run Alvasta Pro CLI commands in Docker           |
 | `clawdock-exec <command>` | Execute an arbitrary command in the container |
 
 ### Web UI and pairing
@@ -68,8 +68,8 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | ---------------------- | --------------------------------------- |
 | `clawdock-health`      | Run a gateway health check              |
 | `clawdock-token`       | Print the gateway token                 |
-| `clawdock-cd`          | Jump to the OpenClaw project directory  |
-| `clawdock-config`      | Open `~/.openclaw`                      |
+| `clawdock-cd`          | Jump to the Alvasta Pro project directory  |
+| `clawdock-config`      | Open `~/.alvasta-pro`                      |
 | `clawdock-show-config` | Print config files with redacted values |
 | `clawdock-workspace`   | Open the workspace directory            |
 
@@ -93,11 +93,11 @@ clawdock-approve <request-id>
 ClawDock works with the same Docker config split described in [Docker](/install/docker):
 
 - `<project>/.env` for Docker-specific values like image name, ports, and the gateway token
-- `~/.openclaw/.env` for env-backed provider keys and bot tokens
-- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` for stored provider OAuth/API-key auth
-- `~/.openclaw/openclaw.json` for behavior config
+- `~/.alvasta-pro/.env` for env-backed provider keys and bot tokens
+- `~/.alvasta-pro/agents/<agentId>/agent/auth-profiles.json` for stored provider OAuth/API-key auth
+- `~/.alvasta-pro/alvasta-pro.json` for behavior config
 
-Use `clawdock-show-config` when you want to inspect the `.env` files and `openclaw.json` quickly. It redacts `.env` values in its printed output.
+Use `clawdock-show-config` when you want to inspect the `.env` files and `alvasta-pro.json` quickly. It redacts `.env` values in its printed output.
 
 ## Related pages
 

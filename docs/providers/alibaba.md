@@ -1,14 +1,14 @@
 ---
 title: "Alibaba Model Studio"
-summary: "Alibaba Model Studio Wan video generation in OpenClaw"
+summary: "Alibaba Model Studio Wan video generation in Alvasta Pro"
 read_when:
-  - You want to use Alibaba Wan video generation in OpenClaw
+  - You want to use Alibaba Wan video generation in Alvasta Pro
   - You need Model Studio or DashScope API key setup for video generation
 ---
 
 # Alibaba Model Studio
 
-OpenClaw ships a bundled `alibaba` video-generation provider for Wan models on
+Alvasta Pro ships a bundled `alibaba` video-generation provider for Wan models on
 Alibaba Model Studio / DashScope.
 
 - Provider: `alibaba`
@@ -21,7 +21,7 @@ Alibaba Model Studio / DashScope.
 1. Set an API key:
 
 ```bash
-openclaw onboard --auth-choice qwen-standard-api-key
+alvasta-pro onboard --auth-choice qwen-standard-api-key
 ```
 
 2. Set a default video model:

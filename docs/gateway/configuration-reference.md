@@ -1,6 +1,6 @@
 ---
 title: "Configuration Reference"
-summary: "Complete reference for every OpenClaw config key, defaults, and channel settings"
+summary: "Complete reference for every Alvasta Pro config key, defaults, and channel settings"
 read_when:
   - You need exact field-level config semantics or defaults
   - You are validating channel, model, gateway, or tool config blocks
@@ -8,9 +8,9 @@ read_when:
 
 # Configuration Reference
 
-Every field available in `~/.openclaw/openclaw.json`. For a task-oriented overview, see [Configuration](/gateway/configuration).
+Every field available in `~/.alvasta-pro/alvasta-pro.json`. For a task-oriented overview, see [Configuration](/gateway/configuration).
 
-Config format is **JSON5** (comments + trailing commas allowed). All fields are optional — OpenClaw uses safe defaults when omitted.
+Config format is **JSON5** (comments + trailing commas allowed). All fields are optional — Alvasta Pro uses safe defaults when omitted.
 
 ---
 
@@ -135,7 +135,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
         default: {},
         personal: {},
         biz: {
-          // authDir: "~/.openclaw/credentials/whatsapp/biz",
+          // authDir: "~/.alvasta-pro/credentials/whatsapp/biz",
         },
       },
     },
@@ -145,7 +145,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
 
 - Outbound commands default to account `default` if present; otherwise the first configured account id (sorted).
 - Optional `channels.whatsapp.defaultAccount` overrides that fallback default account selection when it matches a configured account id.
-- Legacy single-account Baileys auth dir is migrated by `openclaw doctor` into `whatsapp/default`.
+- Legacy single-account Baileys auth dir is migrated by `alvasta-pro doctor` into `whatsapp/default`.
 - Per-account overrides: `channels.whatsapp.accounts.<id>.sendReadReceipts`, `channels.whatsapp.accounts.<id>.dmPolicy`, `channels.whatsapp.accounts.<id>.allowFrom`.
 
 </Accordion>
@@ -206,7 +206,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
 
 - Bot token: `channels.telegram.botToken` or `channels.telegram.tokenFile` (regular file only; symlinks rejected), with `TELEGRAM_BOT_TOKEN` as fallback for the default account.
 - Optional `channels.telegram.defaultAccount` overrides default account selection when it matches a configured account id.
-- In multi-account setups (2+ account ids), set an explicit default (`channels.telegram.defaultAccount` or `channels.telegram.accounts.default`) to avoid fallback routing; `openclaw doctor` warns when this is missing or invalid.
+- In multi-account setups (2+ account ids), set an explicit default (`channels.telegram.defaultAccount` or `channels.telegram.accounts.default`) to avoid fallback routing; `alvasta-pro doctor` warns when this is missing or invalid.
 - `configWrites: false` blocks Telegram-initiated config writes (supergroup ID migrations, `/config set|unset`).
 - Top-level `bindings[]` entries with `type: "acp"` configure persistent ACP bindings for forum topics (use canonical `chatId:topic:topicId` in `match.peer.id`). Field semantics are shared in [ACP Agents](/tools/acp-agents#channel-specific-settings).
 - Telegram stream previews use `sendMessage` + `editMessageText` (works in direct and group chats).
@@ -242,10 +242,10 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
       replyToMode: "off", // off | first | all | batched
       dmPolicy: "pairing",
       allowFrom: ["1234567890", "123456789012345678"],
-      dm: { enabled: true, groupEnabled: false, groupChannels: ["openclaw-dm"] },
+      dm: { enabled: true, groupEnabled: false, groupChannels: ["alvasta-pro-dm"] },
       guilds: {
         "123456789012345678": {
-          slug: "friends-of-openclaw",
+          slug: "friends-of-alvasta-pro",
           requireMention: false,
           ignoreOtherMentions: true,
           reactionNotifications: "own",
@@ -329,7 +329,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
 - `channels.discord.ui.components.accentColor` sets the accent color for Discord components v2 containers.
 - `channels.discord.voice` enables Discord voice channel conversations and optional auto-join + TTS overrides.
 - `channels.discord.voice.daveEncryption` and `channels.discord.voice.decryptionFailureTolerance` pass through to `@discordjs/voice` DAVE options (`true` and `24` by default).
-- OpenClaw additionally attempts voice receive recovery by leaving/rejoining a voice session after repeated decrypt failures.
+- Alvasta Pro additionally attempts voice receive recovery by leaving/rejoining a voice session after repeated decrypt failures.
 - `channels.discord.streaming` is the canonical stream mode key. Legacy `streamMode` and boolean `streaming` values are auto-migrated.
 - `channels.discord.autoPresence` maps runtime availability to bot presence (healthy => online, degraded => idle, exhausted => dnd) and allows optional status text overrides.
 - `channels.discord.dangerouslyAllowNameMatching` re-enables mutable name/tag matching (break-glass compatibility mode).
@@ -419,7 +419,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
       },
       slashCommand: {
         enabled: true,
-        name: "openclaw",
+        name: "alvasta-pro",
         sessionPrefix: "slack:slash",
         ephemeral: true,
       },
@@ -472,7 +472,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
 
 ### Mattermost
 
-Mattermost ships as a plugin: `openclaw plugins install @openclaw/mattermost`.
+Mattermost ships as a plugin: `alvasta-pro plugins install @alvasta-pro/mattermost`.
 
 ```json5
 {
@@ -507,10 +507,10 @@ Chat modes: `oncall` (respond on @-mention, default), `onmessage` (every message
 When Mattermost native commands are enabled:
 
 - `commands.callbackPath` must be a path (for example `/api/channels/mattermost/command`), not a full URL.
-- `commands.callbackUrl` must resolve to the OpenClaw gateway endpoint and be reachable from the Mattermost server.
+- `commands.callbackUrl` must resolve to the Alvasta Pro gateway endpoint and be reachable from the Mattermost server.
 - Native slash callbacks are authenticated with the per-command tokens returned
   by Mattermost during slash command registration. If registration fails or no
-  commands are activated, OpenClaw rejects callbacks with
+  commands are activated, Alvasta Pro rejects callbacks with
   `Unauthorized: invalid command token.`
 - For private/tailnet/internal callback hosts, Mattermost may require
   `ServiceSettings.AllowedUntrustedInternalConnections` to include the callback host/domain.
@@ -569,7 +569,7 @@ BlueBubbles is the recommended iMessage path (plugin-backed, configured under `c
 
 ### iMessage
 
-OpenClaw spawns `imsg rpc` (JSON-RPC over stdio). No daemon or port required.
+Alvasta Pro spawns `imsg rpc` (JSON-RPC over stdio). No daemon or port required.
 
 ```json5
 {
@@ -734,9 +734,9 @@ Run multiple accounts per channel (each with its own `accountId`):
 - Env tokens only apply to the **default** account.
 - Base channel settings apply to all accounts unless overridden per account.
 - Use `bindings[].match.accountId` to route each account to a different agent.
-- If you add a non-default account via `openclaw channels add` (or channel onboarding) while still on a single-account top-level channel config, OpenClaw promotes account-scoped top-level single-account values into the channel account map first so the original account keeps working. Most channels move them into `channels.<channel>.accounts.default`; Matrix can preserve an existing matching named/default target instead.
+- If you add a non-default account via `alvasta-pro channels add` (or channel onboarding) while still on a single-account top-level channel config, Alvasta Pro promotes account-scoped top-level single-account values into the channel account map first so the original account keeps working. Most channels move them into `channels.<channel>.accounts.default`; Matrix can preserve an existing matching named/default target instead.
 - Existing channel-only bindings (no `accountId`) keep matching the default account; account-scoped bindings remain optional.
-- `openclaw doctor --fix` also repairs mixed shapes by moving account-scoped top-level single-account values into the promoted account chosen for that channel. Most channels use `accounts.default`; Matrix can preserve an existing matching named/default target instead.
+- `alvasta-pro doctor --fix` also repairs mixed shapes by moving account-scoped top-level single-account values into the promoted account chosen for that channel. Most channels use `accounts.default`; Matrix can preserve an existing matching named/default target instead.
 
 ### Other extension channels
 
@@ -759,7 +759,7 @@ Group messages default to **require mention** (metadata mention or safe regex pa
     groupChat: { historyLimit: 50 },
   },
   agents: {
-    list: [{ id: "main", groupChat: { mentionPatterns: ["@openclaw", "openclaw"] } }],
+    list: [{ id: "main", groupChat: { mentionPatterns: ["@alvasta-pro", "alvasta-pro"] } }],
   },
 }
 ```
@@ -801,7 +801,7 @@ Include your own number in `allowFrom` to enable self-chat mode (ignores native 
     list: [
       {
         id: "main",
-        groupChat: { mentionPatterns: ["reisponde", "@openclaw"] },
+        groupChat: { mentionPatterns: ["reisponde", "@alvasta-pro"] },
       },
     ],
   },
@@ -836,7 +836,7 @@ Include your own number in `allowFrom` to enable self-chat mode (ignores native 
 - Override per channel: `channels.discord.commands.native` (bool or `"auto"`). `false` clears previously registered commands.
 - `channels.telegram.customCommands` adds extra Telegram bot menu entries.
 - `bash: true` enables `! <cmd>` for host shell. Requires `tools.elevated.enabled` and sender in `tools.elevated.allowFrom.<channel>`.
-- `config: true` enables `/config` (reads/writes `openclaw.json`). For gateway `chat.send` clients, persistent `/config set|unset` writes also require `operator.admin`; read-only `/config show` stays available to normal write-scoped operator clients.
+- `config: true` enables `/config` (reads/writes `alvasta-pro.json`). For gateway `chat.send` clients, persistent `/config set|unset` writes also require `operator.admin`; read-only `/config show` stays available to normal write-scoped operator clients.
 - `channels.<provider>.configWrites` gates config mutations per channel (default: true).
 - For multi-account channels, `channels.<provider>.accounts.<id>.configWrites` also gates writes that target that account (for example `/allowlist --config --account <id>` or `/config set channels.<provider>.accounts.<id>...`).
 - `allowFrom` is per-provider. When set, it is the **only** authorization source (channel allowlists/pairing and `useAccessGroups` are ignored).
@@ -850,21 +850,21 @@ Include your own number in `allowFrom` to enable self-chat mode (ignores native 
 
 ### `agents.defaults.workspace`
 
-Default: `~/.openclaw/workspace`.
+Default: `~/.alvasta-pro/workspace`.
 
 ```json5
 {
-  agents: { defaults: { workspace: "~/.openclaw/workspace" } },
+  agents: { defaults: { workspace: "~/.alvasta-pro/workspace" } },
 }
 ```
 
 ### `agents.defaults.repoRoot`
 
-Optional repository root shown in the system prompt's Runtime line. If unset, OpenClaw auto-detects by walking upward from the workspace.
+Optional repository root shown in the system prompt's Runtime line. If unset, Alvasta Pro auto-detects by walking upward from the workspace.
 
 ```json5
 {
-  agents: { defaults: { repoRoot: "~/Projects/openclaw" } },
+  agents: { defaults: { repoRoot: "~/Projects/alvasta-pro" } },
 }
 ```
 
@@ -1057,7 +1057,7 @@ Time format in system prompt. Default: `auto` (OS preference).
 - `pdfMaxPages`: default maximum pages considered by extraction fallback mode in the `pdf` tool.
 - `verboseDefault`: default verbose level for agents. Values: `"off"`, `"on"`, `"full"`. Default: `"off"`.
 - `elevatedDefault`: default elevated-output level for agents. Values: `"off"`, `"on"`, `"ask"`, `"full"`. Default: `"on"`.
-- `model.primary`: format `provider/model` (e.g. `openai/gpt-5.4`). If you omit the provider, OpenClaw tries an alias first, then a unique configured-provider match for that exact model id, and only then falls back to the configured default provider (deprecated compatibility behavior, so prefer explicit `provider/model`). If that provider no longer exposes the configured default model, OpenClaw falls back to the first configured provider/model instead of surfacing a stale removed-provider default.
+- `model.primary`: format `provider/model` (e.g. `openai/gpt-5.4`). If you omit the provider, Alvasta Pro tries an alias first, then a unique configured-provider match for that exact model id, and only then falls back to the configured default provider (deprecated compatibility behavior, so prefer explicit `provider/model`). If that provider no longer exposes the configured default model, Alvasta Pro falls back to the first configured provider/model instead of surfacing a stale removed-provider default.
 - `models`: the configured model catalog and allowlist for `/model`. Each entry can include `alias` (shortcut) and `params` (provider-specific, for example `temperature`, `maxTokens`, `cacheRetention`, `context1m`).
 - `params`: global default provider parameters applied to all models. Set at `agents.defaults.params` (e.g. `{ cacheRetention: "long" }`).
 - `params` merge precedence (config): `agents.defaults.params` (global base) is overridden by `agents.defaults.models["provider/model"].params` (per-model), then `agents.list[].params` (matching agent id) overrides by key. See [Prompt Caching](/reference/prompt-caching) for details.
@@ -1180,7 +1180,7 @@ Periodic heartbeat runs.
 ```
 
 - `mode`: `default` or `safeguard` (chunked summarization for long histories). See [Compaction](/concepts/compaction).
-- `timeoutSeconds`: maximum seconds allowed for a single compaction operation before OpenClaw aborts it. Default: `900`.
+- `timeoutSeconds`: maximum seconds allowed for a single compaction operation before Alvasta Pro aborts it. Default: `900`.
 - `identifierPolicy`: `strict` (default), `off`, or `custom`. `strict` prepends built-in opaque identifier retention guidance during compaction summarization.
 - `identifierInstructions`: optional custom identifier-preservation text used when `identifierPolicy=custom`.
 - `postCompactionSections`: optional AGENTS.md H2/H3 section names to re-inject after compaction. Defaults to `["Session Startup", "Red Lines"]`; set `[]` to disable reinjection. When unset or explicitly set to that default pair, older `Every Session`/`Safety` headings are also accepted as a legacy fallback.
@@ -1287,10 +1287,10 @@ Optional sandboxing for the embedded agent. See [Sandboxing](/gateway/sandboxing
         backend: "docker", // docker | ssh | openshell
         scope: "agent", // session | agent | shared
         workspaceAccess: "none", // none | ro | rw
-        workspaceRoot: "~/.openclaw/sandboxes",
+        workspaceRoot: "~/.alvasta-pro/sandboxes",
         docker: {
-          image: "openclaw-sandbox:bookworm-slim",
-          containerPrefix: "openclaw-sbx-",
+          image: "alvasta-pro-sandbox:bookworm-slim",
+          containerPrefix: "alvasta-pro-sbx-",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -1308,7 +1308,7 @@ Optional sandboxing for the embedded agent. See [Sandboxing](/gateway/sandboxing
             nproc: 256,
           },
           seccompProfile: "/path/to/seccomp.json",
-          apparmorProfile: "openclaw-sandbox",
+          apparmorProfile: "alvasta-pro-sandbox",
           dns: ["1.1.1.1", "8.8.8.8"],
           extraHosts: ["internal.service:10.0.0.5"],
           binds: ["/home/user/source:/source:rw"],
@@ -1316,7 +1316,7 @@ Optional sandboxing for the embedded agent. See [Sandboxing](/gateway/sandboxing
         ssh: {
           target: "user@gateway-host:22",
           command: "ssh",
-          workspaceRoot: "/tmp/openclaw-sandboxes",
+          workspaceRoot: "/tmp/alvasta-pro-sandboxes",
           strictHostKeyChecking: true,
           updateHostKeys: true,
           identityFile: "~/.ssh/id_ed25519",
@@ -1329,8 +1329,8 @@ Optional sandboxing for the embedded agent. See [Sandboxing](/gateway/sandboxing
         },
         browser: {
           enabled: false,
-          image: "openclaw-sandbox-browser:bookworm-slim",
-          network: "openclaw-sandbox-browser",
+          image: "alvasta-pro-sandbox-browser:bookworm-slim",
+          network: "alvasta-pro-sandbox-browser",
           cdpPort: 9222,
           cdpSourceRange: "172.21.0.1/32",
           vncPort: 5900,
@@ -1388,7 +1388,7 @@ When `backend: "openshell"` is selected, runtime-specific settings move to
 - `command`: SSH client command (default: `ssh`)
 - `workspaceRoot`: absolute remote root used for per-scope workspaces
 - `identityFile` / `certificateFile` / `knownHostsFile`: existing local files passed to OpenSSH
-- `identityData` / `certificateData` / `knownHostsData`: inline contents or SecretRefs that OpenClaw materializes into temp files at runtime
+- `identityData` / `certificateData` / `knownHostsData`: inline contents or SecretRefs that Alvasta Pro materializes into temp files at runtime
 - `strictHostKeyChecking` / `updateHostKeys`: OpenSSH host-key policy knobs
 
 **SSH auth precedence:**
@@ -1408,7 +1408,7 @@ When `backend: "openshell"` is selected, runtime-specific settings move to
 
 **Workspace access:**
 
-- `none`: per-scope sandbox workspace under `~/.openclaw/sandboxes`
+- `none`: per-scope sandbox workspace under `~/.alvasta-pro/sandboxes`
 - `ro`: sandbox workspace at `/workspace`, agent workspace mounted read-only at `/agent`
 - `rw`: agent workspace mounted read/write at `/workspace`
 
@@ -1428,7 +1428,7 @@ When `backend: "openshell"` is selected, runtime-specific settings move to
         enabled: true,
         config: {
           mode: "mirror", // mirror | remote
-          from: "openclaw",
+          from: "alvasta-pro",
           remoteWorkspaceDir: "/sandbox",
           remoteAgentWorkspaceDir: "/agent",
           gateway: "lab", // optional
@@ -1449,7 +1449,7 @@ When `backend: "openshell"` is selected, runtime-specific settings move to
 - `mirror`: seed remote from local before exec, sync back after exec; local workspace stays canonical
 - `remote`: seed remote once when the sandbox is created, then keep the remote workspace canonical
 
-In `remote` mode, host-local edits made outside OpenClaw are not synced into the sandbox automatically after the seed step.
+In `remote` mode, host-local edits made outside Alvasta Pro are not synced into the sandbox automatically after the seed step.
 Transport is SSH into the OpenShell sandbox, but the plugin owns sandbox lifecycle and optional mirror sync.
 
 **`setupCommand`** runs once after container creation (via `sh -lc`). Needs network egress, writable root, root user.
@@ -1462,11 +1462,11 @@ Transport is SSH into the OpenShell sandbox, but the plugin owns sandbox lifecyc
 
 **`docker.binds`** mounts additional host directories; global and per-agent binds are merged.
 
-**Sandboxed browser** (`sandbox.browser.enabled`): Chromium + CDP in a container. noVNC URL injected into system prompt. Does not require `browser.enabled` in `openclaw.json`.
-noVNC observer access uses VNC auth by default and OpenClaw emits a short-lived token URL (instead of exposing the password in the shared URL).
+**Sandboxed browser** (`sandbox.browser.enabled`): Chromium + CDP in a container. noVNC URL injected into system prompt. Does not require `browser.enabled` in `alvasta-pro.json`.
+noVNC observer access uses VNC auth by default and Alvasta Pro emits a short-lived token URL (instead of exposing the password in the shared URL).
 
 - `allowHostControl: false` (default) blocks sandboxed sessions from targeting the host browser.
-- `network` defaults to `openclaw-sandbox-browser` (dedicated bridge network). Set to `bridge` only when you explicitly want global bridge connectivity.
+- `network` defaults to `alvasta-pro-sandbox-browser` (dedicated bridge network). Set to `bridge` only when you explicitly want global bridge connectivity.
 - `cdpSourceRange` optionally restricts CDP ingress at the container edge to a CIDR range (for example `172.21.0.1/32`).
 - `sandbox.browser.binds` mounts additional host directories into the sandbox browser container only. When set (including `[]`), it replaces `docker.binds` for the browser container.
 - Launch defaults are defined in `scripts/sandbox-browser-entrypoint.sh` and tuned for container hosts:
@@ -1520,8 +1520,8 @@ scripts/sandbox-browser-setup.sh   # optional browser image
         id: "main",
         default: true,
         name: "Main Agent",
-        workspace: "~/.openclaw/workspace",
-        agentDir: "~/.openclaw/agents/main/agent",
+        workspace: "~/.alvasta-pro/workspace",
+        agentDir: "~/.alvasta-pro/agents/main/agent",
         model: "anthropic/claude-opus-4-6", // or { primary, fallbacks }
         thinkingDefault: "high", // per-agent thinking level override
         reasoningDefault: "on", // per-agent reasoning visibility override
@@ -1534,7 +1534,7 @@ scripts/sandbox-browser-setup.sh   # optional browser image
           emoji: "🦥",
           avatar: "avatars/samantha.png",
         },
-        groupChat: { mentionPatterns: ["@openclaw"] },
+        groupChat: { mentionPatterns: ["@alvasta-pro"] },
         sandbox: { mode: "off" },
         runtime: {
           type: "acp",
@@ -1542,7 +1542,7 @@ scripts/sandbox-browser-setup.sh   # optional browser image
             agent: "codex",
             backend: "acpx",
             mode: "persistent",
-            cwd: "/workspace/openclaw",
+            cwd: "/workspace/alvasta-pro",
           },
         },
         subagents: { allowAgents: ["*"] },
@@ -1583,8 +1583,8 @@ Run multiple isolated agents inside one Gateway. See [Multi-Agent](/concepts/mul
 {
   agents: {
     list: [
-      { id: "home", default: true, workspace: "~/.openclaw/workspace-home" },
-      { id: "work", workspace: "~/.openclaw/workspace-work" },
+      { id: "home", default: true, workspace: "~/.alvasta-pro/workspace-home" },
+      { id: "work", workspace: "~/.alvasta-pro/workspace-work" },
     ],
   },
   bindings: [
@@ -1614,7 +1614,7 @@ Run multiple isolated agents inside one Gateway. See [Multi-Agent](/concepts/mul
 
 Within each tier, the first matching `bindings` entry wins.
 
-For `type: "acp"` entries, OpenClaw resolves by exact conversation identity (`match.channel` + account + `match.peer.id`) and does not use the route binding tier order above.
+For `type: "acp"` entries, Alvasta Pro resolves by exact conversation identity (`match.channel` + account + `match.peer.id`) and does not use the route binding tier order above.
 
 ### Per-agent access profiles
 
@@ -1626,7 +1626,7 @@ For `type: "acp"` entries, OpenClaw resolves by exact conversation identity (`ma
     list: [
       {
         id: "personal",
-        workspace: "~/.openclaw/workspace-personal",
+        workspace: "~/.alvasta-pro/workspace-personal",
         sandbox: { mode: "off" },
       },
     ],
@@ -1644,7 +1644,7 @@ For `type: "acp"` entries, OpenClaw resolves by exact conversation identity (`ma
     list: [
       {
         id: "family",
-        workspace: "~/.openclaw/workspace-family",
+        workspace: "~/.alvasta-pro/workspace-family",
         sandbox: { mode: "all", scope: "agent", workspaceAccess: "ro" },
         tools: {
           allow: [
@@ -1673,7 +1673,7 @@ For `type: "acp"` entries, OpenClaw resolves by exact conversation identity (`ma
     list: [
       {
         id: "public",
-        workspace: "~/.openclaw/workspace-public",
+        workspace: "~/.alvasta-pro/workspace-public",
         sandbox: { mode: "all", scope: "agent", workspaceAccess: "none" },
         tools: {
           allow: [
@@ -1736,7 +1736,7 @@ See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for preceden
       group: { mode: "idle", idleMinutes: 120 },
     },
     resetTriggers: ["/new", "/reset"],
-    store: "~/.openclaw/agents/{agentId}/sessions/sessions.json",
+    store: "~/.alvasta-pro/agents/{agentId}/sessions/sessions.json",
     parentForkMaxTokens: 100000, // skip parent-thread fork above this token count (0 disables)
     maintenance: {
       mode: "warn", // warn | enforce
@@ -1776,7 +1776,7 @@ See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for preceden
 - **`reset`**: primary reset policy. `daily` resets at `atHour` local time; `idle` resets after `idleMinutes`. When both configured, whichever expires first wins.
 - **`resetByType`**: per-type overrides (`direct`, `group`, `thread`). Legacy `dm` accepted as alias for `direct`.
 - **`parentForkMaxTokens`**: max parent-session `totalTokens` allowed when creating a forked thread session (default `100000`).
-  - If parent `totalTokens` is above this value, OpenClaw starts a fresh thread session instead of inheriting parent transcript history.
+  - If parent `totalTokens` is above this value, Alvasta Pro starts a fresh thread session instead of inheriting parent transcript history.
   - Set `0` to disable this guard and always allow parent forking.
 - **`mainKey`**: legacy field. Runtime now always uses `"main"` for the main direct-chat bucket.
 - **`agentToAgent.maxPingPongTurns`**: maximum reply-back turns between agents during agent-to-agent exchanges (integer, range: `0`–`5`). `0` disables ping-pong chaining.
@@ -1874,7 +1874,7 @@ Batches rapid text-only messages from the same sender into a single agent turn. 
       modelOverrides: { enabled: true },
       maxTextLength: 4000,
       timeoutMs: 30000,
-      prefsPath: "~/.openclaw/settings/tts.json",
+      prefsPath: "~/.alvasta-pro/settings/tts.json",
       elevenlabs: {
         apiKey: "elevenlabs_api_key",
         baseUrl: "https://api.elevenlabs.io",
@@ -1907,7 +1907,7 @@ Batches rapid text-only messages from the same sender into a single agent turn. 
 - `modelOverrides` is enabled by default; `modelOverrides.allowProvider` defaults to `false` (opt-in).
 - API keys fall back to `ELEVENLABS_API_KEY`/`XI_API_KEY` and `OPENAI_API_KEY`.
 - `openai.baseUrl` overrides the OpenAI TTS endpoint. Resolution order is config, then `OPENAI_TTS_BASE_URL`, then `https://api.openai.com/v1`.
-- When `openai.baseUrl` points to a non-OpenAI endpoint, OpenClaw treats it as an OpenAI-compatible TTS server and relaxes model/voice validation.
+- When `openai.baseUrl` points to a non-OpenAI endpoint, Alvasta Pro treats it as an OpenAI-compatible TTS server and relaxes model/voice validation.
 
 ---
 
@@ -1977,7 +1977,7 @@ Local onboarding defaults new local configs to `tools.profile: "coding"` when un
 | `group:nodes`      | `nodes`                                                                                                                 |
 | `group:agents`     | `agents_list`                                                                                                           |
 | `group:media`      | `image`, `image_generate`, `video_generate`, `tts`                                                                      |
-| `group:openclaw`   | All built-in tools (excludes provider plugins)                                                                          |
+| `group:alvasta-pro`   | All built-in tools (excludes provider plugins)                                                                          |
 
 ### `tools.allow` / `tools.deny`
 
@@ -2234,7 +2234,7 @@ Controls inline attachment support for `sessions_spawn`.
 Notes:
 
 - Attachments are only supported for `runtime: "subagent"`. ACP runtime rejects them.
-- Files are materialized into the child workspace at `.openclaw/attachments/<uuid>/` with a `.manifest.json`.
+- Files are materialized into the child workspace at `.alvasta-pro/attachments/<uuid>/` with a `.manifest.json`.
 - Attachment content is automatically redacted from transcript persistence.
 - Base64 inputs are validated with strict alphabet/padding checks and a pre-decode size guard.
 - File permissions are `0700` for directories and `0600` for files.
@@ -2287,7 +2287,7 @@ Notes:
 
 ## Custom providers and base URLs
 
-OpenClaw uses the built-in model catalog. Add custom providers via `models.providers` in config or `~/.openclaw/agents/<agentId>/agent/models.json`.
+Alvasta Pro uses the built-in model catalog. Add custom providers via `models.providers` in config or `~/.alvasta-pro/agents/<agentId>/agent/models.json`.
 
 ```json5
 {
@@ -2348,7 +2348,7 @@ OpenClaw uses the built-in model catalog. Add custom providers via `models.provi
 - `models.providers.*.models`: explicit provider model catalog entries.
 - `models.providers.*.models.*.contextWindow`: native model context window metadata.
 - `models.providers.*.models.*.contextTokens`: optional runtime context cap. Use this when you want a smaller effective context budget than the model's native `contextWindow`.
-- `models.providers.*.models.*.compat.supportsDeveloperRole`: optional compatibility hint. For `api: "openai-completions"` with a non-empty non-native `baseUrl` (host not `api.openai.com`), OpenClaw forces this to `false` at runtime. Empty/omitted `baseUrl` keeps default OpenAI behavior.
+- `models.providers.*.models.*.compat.supportsDeveloperRole`: optional compatibility hint. For `api: "openai-completions"` with a non-empty non-native `baseUrl` (host not `api.openai.com`), Alvasta Pro forces this to `false` at runtime. Empty/omitted `baseUrl` keeps default OpenAI behavior.
 - `plugins.entries.amazon-bedrock.config.discovery`: Bedrock auto-discovery settings root.
 - `plugins.entries.amazon-bedrock.config.discovery.enabled`: turn implicit discovery on/off.
 - `plugins.entries.amazon-bedrock.config.discovery.region`: AWS region for discovery.
@@ -2410,7 +2410,7 @@ Use `cerebras/zai-glm-4.7` for Cerebras; `zai/glm-4.7` for Z.AI direct.
 }
 ```
 
-Set `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`). Use `opencode/...` refs for the Zen catalog or `opencode-go/...` refs for the Go catalog. Shortcut: `openclaw onboard --auth-choice opencode-zen` or `openclaw onboard --auth-choice opencode-go`.
+Set `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`). Use `opencode/...` refs for the Zen catalog or `opencode-go/...` refs for the Go catalog. Shortcut: `alvasta-pro onboard --auth-choice opencode-zen` or `alvasta-pro onboard --auth-choice opencode-go`.
 
 </Accordion>
 
@@ -2427,7 +2427,7 @@ Set `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`). Use `opencode/...` refs for 
 }
 ```
 
-Set `ZAI_API_KEY`. `z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `openclaw onboard --auth-choice zai-api-key`.
+Set `ZAI_API_KEY`. `z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `alvasta-pro onboard --auth-choice zai-api-key`.
 
 - General endpoint: `https://api.z.ai/api/paas/v4`
 - Coding endpoint (default): `https://api.z.ai/api/coding/paas/v4`
@@ -2470,10 +2470,10 @@ Set `ZAI_API_KEY`. `z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `opencl
 }
 ```
 
-For the China endpoint: `baseUrl: "https://api.moonshot.cn/v1"` or `openclaw onboard --auth-choice moonshot-api-key-cn`.
+For the China endpoint: `baseUrl: "https://api.moonshot.cn/v1"` or `alvasta-pro onboard --auth-choice moonshot-api-key-cn`.
 
 Native Moonshot endpoints advertise streaming usage compatibility on the shared
-`openai-completions` transport, and OpenClaw now keys that off endpoint
+`openai-completions` transport, and Alvasta Pro now keys that off endpoint
 capabilities rather than the built-in provider id alone.
 
 </Accordion>
@@ -2492,7 +2492,7 @@ capabilities rather than the built-in provider id alone.
 }
 ```
 
-Anthropic-compatible, built-in provider. Shortcut: `openclaw onboard --auth-choice kimi-code-api-key`.
+Anthropic-compatible, built-in provider. Shortcut: `alvasta-pro onboard --auth-choice kimi-code-api-key`.
 
 </Accordion>
 
@@ -2531,7 +2531,7 @@ Anthropic-compatible, built-in provider. Shortcut: `openclaw onboard --auth-choi
 }
 ```
 
-Base URL should omit `/v1` (Anthropic client appends it). Shortcut: `openclaw onboard --auth-choice synthetic-api-key`.
+Base URL should omit `/v1` (Anthropic client appends it). Shortcut: `alvasta-pro onboard --auth-choice synthetic-api-key`.
 
 </Accordion>
 
@@ -2572,10 +2572,10 @@ Base URL should omit `/v1` (Anthropic client appends it). Shortcut: `openclaw on
 ```
 
 Set `MINIMAX_API_KEY`. Shortcuts:
-`openclaw onboard --auth-choice minimax-global-api` or
-`openclaw onboard --auth-choice minimax-cn-api`.
+`alvasta-pro onboard --auth-choice minimax-global-api` or
+`alvasta-pro onboard --auth-choice minimax-cn-api`.
 The model catalog now defaults to M2.7 only.
-On the Anthropic-compatible streaming path, OpenClaw disables MiniMax thinking
+On the Anthropic-compatible streaming path, Alvasta Pro disables MiniMax thinking
 by default unless you explicitly set `thinking` yourself. `/fast on` or
 `params.fastMode: true` rewrites `MiniMax-M2.7` to
 `MiniMax-M2.7-highspeed`.
@@ -2619,7 +2619,7 @@ See [Local Models](/gateway/local-models). TL;DR: run a large local model via LM
 - `load.extraDirs`: extra shared skill roots (lowest precedence).
 - `install.preferBrew`: when true, prefer Homebrew installers when `brew` is
   available before falling back to other installer kinds.
-- `install.nodeManager`: node installer preference for `metadata.openclaw.install`
+- `install.nodeManager`: node installer preference for `metadata.alvasta-pro.install`
   specs (`npm` | `pnpm` | `yarn` | `bun`).
 - `entries.<skillKey>.enabled: false` disables a skill even if bundled/installed.
 - `entries.<skillKey>.apiKey`: convenience for skills declaring a primary env var (plaintext string or SecretRef object).
@@ -2650,8 +2650,8 @@ See [Local Models](/gateway/local-models). TL;DR: run a large local model via LM
 }
 ```
 
-- Loaded from `~/.openclaw/extensions`, `<workspace>/.openclaw/extensions`, plus `plugins.load.paths`.
-- Discovery accepts native OpenClaw plugins plus compatible Codex bundles and Claude bundles, including manifestless Claude default-layout bundles.
+- Loaded from `~/.alvasta-pro/extensions`, `<workspace>/.alvasta-pro/extensions`, plus `plugins.load.paths`.
+- Discovery accepts native Alvasta Pro plugins plus compatible Codex bundles and Claude bundles, including manifestless Claude default-layout bundles.
 - **Config changes require a gateway restart.**
 - `allow`: optional allowlist (only listed plugins load). `deny` wins.
 - `plugins.entries.<id>.apiKey`: plugin-level API key convenience field (when supported by the plugin).
@@ -2659,7 +2659,7 @@ See [Local Models](/gateway/local-models). TL;DR: run a large local model via LM
 - `plugins.entries.<id>.hooks.allowPromptInjection`: when `false`, core blocks `before_prompt_build` and ignores prompt-mutating fields from legacy `before_agent_start`, while preserving legacy `modelOverride` and `providerOverride`. Applies to native plugin hooks and supported bundle-provided hook directories.
 - `plugins.entries.<id>.subagent.allowModelOverride`: explicitly trust this plugin to request per-run `provider` and `model` overrides for background subagent runs.
 - `plugins.entries.<id>.subagent.allowedModels`: optional allowlist of canonical `provider/model` targets for trusted subagent overrides. Use `"*"` only when you intentionally want to allow any model.
-- `plugins.entries.<id>.config`: plugin-defined config object (validated by native OpenClaw plugin schema when available).
+- `plugins.entries.<id>.config`: plugin-defined config object (validated by native Alvasta Pro plugin schema when available).
 - `plugins.entries.firecrawl.config.webFetch`: Firecrawl web-fetch provider settings.
   - `apiKey`: Firecrawl API key (accepts SecretRef). Falls back to `plugins.entries.firecrawl.config.webSearch.apiKey`, legacy `tools.web.fetch.firecrawl.apiKey`, or `FIRECRAWL_API_KEY` env var.
   - `baseUrl`: Firecrawl API base URL (default: `https://api.firecrawl.dev`).
@@ -2673,10 +2673,10 @@ See [Local Models](/gateway/local-models). TL;DR: run a large local model via LM
   - `enabled`: master dreaming switch (default `false`).
   - `frequency`: cron cadence for each full dreaming sweep (`"0 3 * * *"` by default).
   - phase policy and thresholds are implementation details (not user-facing config keys).
-- Enabled Claude bundle plugins can also contribute embedded Pi defaults from `settings.json`; OpenClaw applies those as sanitized agent settings, not as raw OpenClaw config patches.
+- Enabled Claude bundle plugins can also contribute embedded Pi defaults from `settings.json`; Alvasta Pro applies those as sanitized agent settings, not as raw Alvasta Pro config patches.
 - `plugins.slots.memory`: pick the active memory plugin id, or `"none"` to disable memory plugins.
 - `plugins.slots.contextEngine`: pick the active context engine plugin id; defaults to `"legacy"` unless you install and select another engine.
-- `plugins.installs`: CLI-managed install metadata used by `openclaw plugins update`.
+- `plugins.installs`: CLI-managed install metadata used by `alvasta-pro plugins update`.
   - Includes `source`, `spec`, `sourcePath`, `installPath`, `version`, `resolvedName`, `resolvedVersion`, `resolvedSpec`, `integrity`, `shasum`, `resolvedAt`, `installedAt`.
   - Treat `plugins.installs.*` as managed state; prefer CLI commands over manual edits.
 
@@ -2699,7 +2699,7 @@ See [Plugins](/tools/plugin).
       // allowedHostnames: ["localhost"],
     },
     profiles: {
-      openclaw: { cdpPort: 18800, color: "#FF4500" },
+      alvasta-pro: { cdpPort: 18800, color: "#FF4500" },
       work: { cdpPort: 18801, color: "#0066CC" },
       user: { driver: "existing-session", attachOnly: true, color: "#00AA00" },
       brave: {
@@ -2728,7 +2728,7 @@ See [Plugins](/tools/plugin).
 - In strict mode, use `ssrfPolicy.hostnameAllowlist` and `ssrfPolicy.allowedHostnames` for explicit exceptions.
 - Remote profiles are attach-only (start/stop/reset disabled).
 - `profiles.*.cdpUrl` accepts `http://`, `https://`, `ws://`, and `wss://`.
-  Use HTTP(S) when you want OpenClaw to discover `/json/version`; use WS(S)
+  Use HTTP(S) when you want Alvasta Pro to discover `/json/version`; use WS(S)
   when your provider gives you a direct DevTools WebSocket URL.
 - `existing-session` profiles are host-only and use Chrome MCP instead of CDP.
 - `existing-session` profiles can set `userDataDir` to target a specific
@@ -2737,7 +2737,7 @@ See [Plugins](/tools/plugin).
   snapshot/ref-driven actions instead of CSS-selector targeting, one-file upload
   hooks, no dialog timeout overrides, no `wait --load networkidle`, and no
   `responsebody`, PDF export, download interception, or batch actions.
-- Local managed `openclaw` profiles auto-assign `cdpPort` and `cdpUrl`; only
+- Local managed `alvasta-pro` profiles auto-assign `cdpPort` and `cdpUrl`; only
   set `cdpUrl` explicitly for remote CDP.
 - Auto-detect order: default browser if Chromium-based → Chrome → Brave → Edge → Chromium → Chrome Canary.
 - Control service: loopback only (port derived from `gateway.port`, default `18791`).
@@ -2753,7 +2753,7 @@ See [Plugins](/tools/plugin).
   ui: {
     seamColor: "#FF4500",
     assistant: {
-      name: "OpenClaw",
+      name: "Alvasta Pro",
       avatar: "CB", // emoji, short text, image URL, or data URI
     },
   },
@@ -2792,7 +2792,7 @@ See [Plugins](/tools/plugin).
     },
     controlUi: {
       enabled: true,
-      basePath: "/openclaw",
+      basePath: "/alvasta-pro",
       // root: "dist/control-ui",
       // allowedOrigins: ["https://control.example.com"], // required for non-loopback Control UI
       // dangerouslyAllowHostHeaderOriginFallback: false, // dangerous Host-header origin fallback mode
@@ -2888,12 +2888,12 @@ See [Plugins](/tools/plugin).
 Run multiple gateways on one host with unique ports and state dirs:
 
 ```bash
-OPENCLAW_CONFIG_PATH=~/.openclaw/a.json \
-OPENCLAW_STATE_DIR=~/.openclaw-a \
-openclaw gateway --port 19001
+OPENCLAW_CONFIG_PATH=~/.alvasta-pro/a.json \
+OPENCLAW_STATE_DIR=~/.alvasta-pro-a \
+alvasta-pro gateway --port 19001
 ```
 
-Convenience flags: `--dev` (uses `~/.openclaw-dev` + port `19001`), `--profile <name>` (uses `~/.openclaw-<name>`).
+Convenience flags: `--dev` (uses `~/.alvasta-pro-dev` + port `19001`), `--profile <name>` (uses `~/.alvasta-pro-<name>`).
 
 See [Multiple Gateways](/gateway/multiple-gateways).
 
@@ -2905,9 +2905,9 @@ See [Multiple Gateways](/gateway/multiple-gateways).
     tls: {
       enabled: false,
       autoGenerate: false,
-      certPath: "/etc/openclaw/tls/server.crt",
-      keyPath: "/etc/openclaw/tls/server.key",
-      caPath: "/etc/openclaw/tls/ca-bundle.crt",
+      certPath: "/etc/alvasta-pro/tls/server.crt",
+      keyPath: "/etc/alvasta-pro/tls/server.key",
+      caPath: "/etc/alvasta-pro/tls/ca-bundle.crt",
     },
   },
 }
@@ -2957,7 +2957,7 @@ See [Multiple Gateways](/gateway/multiple-gateways).
     allowedSessionKeyPrefixes: ["hook:"],
     allowedAgentIds: ["hooks", "main"],
     presets: ["gmail"],
-    transformsDir: "~/.openclaw/hooks/transforms",
+    transformsDir: "~/.alvasta-pro/hooks/transforms",
     mappings: [
       {
         match: { path: "gmail" },
@@ -2976,7 +2976,7 @@ See [Multiple Gateways](/gateway/multiple-gateways).
 }
 ```
 
-Auth: `Authorization: Bearer <token>` or `x-openclaw-token: <token>`.
+Auth: `Authorization: Bearer <token>` or `x-alvasta-pro-token: <token>`.
 Query-string hook tokens are rejected.
 
 Validation and safety notes:
@@ -3016,7 +3016,7 @@ Validation and safety notes:
 {
   hooks: {
     gmail: {
-      account: "openclaw@gmail.com",
+      account: "alvasta-pro@gmail.com",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
       pushToken: "shared-push-token",
@@ -3043,7 +3043,7 @@ Validation and safety notes:
 ```json5
 {
   canvasHost: {
-    root: "~/.openclaw/workspace/canvas",
+    root: "~/.alvasta-pro/workspace/canvas",
     liveReload: true,
     // enabled: false, // or OPENCLAW_SKIP_CANVAS_HOST=1
   },
@@ -3051,15 +3051,15 @@ Validation and safety notes:
 ```
 
 - Serves agent-editable HTML/CSS/JS and A2UI over HTTP under the Gateway port:
-  - `http://<gateway-host>:<gateway.port>/__openclaw__/canvas/`
-  - `http://<gateway-host>:<gateway.port>/__openclaw__/a2ui/`
+  - `http://<gateway-host>:<gateway.port>/__alvasta-pro__/canvas/`
+  - `http://<gateway-host>:<gateway.port>/__alvasta-pro__/a2ui/`
 - Local-only: keep `gateway.bind: "loopback"` (default).
 - Non-loopback binds: canvas routes require Gateway auth (token/password/trusted-proxy), same as other Gateway HTTP surfaces.
 - Node WebViews typically don't send auth headers; after a node is paired and connected, the Gateway advertises node-scoped capability URLs for canvas/A2UI access.
 - Capability URLs are bound to the active node WS session and expire quickly. IP-based fallback is not used.
 - Injects live-reload client into served HTML.
 - Auto-creates starter `index.html` when empty.
-- Also serves A2UI at `/__openclaw__/a2ui/`.
+- Also serves A2UI at `/__alvasta-pro__/a2ui/`.
 - Changes require a gateway restart.
 - Disable live reload for large directories or `EMFILE` errors.
 
@@ -3081,7 +3081,7 @@ Validation and safety notes:
 
 - `minimal` (default): omit `cliPath` + `sshPort` from TXT records.
 - `full`: include `cliPath` + `sshPort`.
-- Hostname defaults to `openclaw`. Override with `OPENCLAW_MDNS_HOSTNAME`.
+- Hostname defaults to `alvasta-pro`. Override with `OPENCLAW_MDNS_HOSTNAME`.
 
 ### Wide-area (DNS-SD)
 
@@ -3093,9 +3093,9 @@ Validation and safety notes:
 }
 ```
 
-Writes a unicast DNS-SD zone under `~/.openclaw/dns/`. For cross-network discovery, pair with a DNS server (CoreDNS recommended) + Tailscale split DNS.
+Writes a unicast DNS-SD zone under `~/.alvasta-pro/dns/`. For cross-network discovery, pair with a DNS server (CoreDNS recommended) + Tailscale split DNS.
 
-Setup: `openclaw dns setup --apply`.
+Setup: `alvasta-pro dns setup --apply`.
 
 ---
 
@@ -3119,7 +3119,7 @@ Setup: `openclaw dns setup --apply`.
 ```
 
 - Inline env vars are only applied if the process env is missing the key.
-- `.env` files: CWD `.env` + `~/.openclaw/.env` (neither overrides existing vars).
+- `.env` files: CWD `.env` + `~/.alvasta-pro/.env` (neither overrides existing vars).
 - `shellEnv`: imports missing expected keys from your login shell profile.
 - See [Environment](/help/environment) for full precedence.
 
@@ -3165,7 +3165,7 @@ Validation:
 ### Supported credential surface
 
 - Canonical matrix: [SecretRef Credential Surface](/reference/secretref-credential-surface)
-- `secrets apply` targets supported `openclaw.json` credential paths.
+- `secrets apply` targets supported `alvasta-pro.json` credential paths.
 - `auth-profiles.json` refs are included in runtime resolution and audit coverage.
 
 ### Secret providers config
@@ -3177,13 +3177,13 @@ Validation:
       default: { source: "env" }, // optional explicit env provider
       filemain: {
         source: "file",
-        path: "~/.openclaw/secrets.json",
+        path: "~/.alvasta-pro/secrets.json",
         mode: "json",
         timeoutMs: 5000,
       },
       vault: {
         source: "exec",
-        command: "/usr/local/bin/openclaw-vault-resolver",
+        command: "/usr/local/bin/alvasta-pro-vault-resolver",
         passEnv: ["PATH", "VAULT_ADDR"],
       },
     },
@@ -3230,7 +3230,7 @@ Notes:
 - `auth-profiles.json` supports value-level refs (`keyRef` for `api_key`, `tokenRef` for `token`) for static credential modes.
 - OAuth-mode profiles (`auth.profiles.<id>.mode = "oauth"`) do not support SecretRef-backed auth-profile credentials.
 - Static runtime credentials come from in-memory resolved snapshots; legacy static `auth.json` entries are scrubbed when discovered.
-- Legacy OAuth imports from `~/.openclaw/credentials/oauth.json`.
+- Legacy OAuth imports from `~/.alvasta-pro/credentials/oauth.json`.
 - See [OAuth](/concepts/oauth).
 - Secrets runtime behavior and `audit/configure/apply` tooling: [Secrets Management](/gateway/secrets).
 
@@ -3278,7 +3278,7 @@ Notes:
 {
   logging: {
     level: "info",
-    file: "/tmp/openclaw/openclaw.log",
+    file: "/tmp/alvasta-pro/alvasta-pro.log",
     consoleLevel: "info",
     consoleStyle: "pretty", // pretty | compact | json
     redactSensitive: "tools", // off | tools
@@ -3287,7 +3287,7 @@ Notes:
 }
 ```
 
-- Default log file: `/tmp/openclaw/openclaw-YYYY-MM-DD.log`.
+- Default log file: `/tmp/alvasta-pro/alvasta-pro-YYYY-MM-DD.log`.
 - Set `logging.file` for a stable path.
 - `consoleLevel` bumps to `debug` when `--verbose`.
 - `maxFileBytes`: maximum log file size in bytes before writes are suppressed (positive integer; default: `524288000` = 500 MB). Use external log rotation for production deployments.
@@ -3308,7 +3308,7 @@ Notes:
       endpoint: "https://otel-collector.example.com:4318",
       protocol: "http/protobuf", // http/protobuf | grpc
       headers: { "x-tenant-id": "my-org" },
-      serviceName: "openclaw-gateway",
+      serviceName: "alvasta-pro-gateway",
       traces: true,
       metrics: true,
       logs: false,
@@ -3318,7 +3318,7 @@ Notes:
 
     cacheTrace: {
       enabled: false,
-      filePath: "~/.openclaw/logs/cache-trace.jsonl",
+      filePath: "~/.alvasta-pro/logs/cache-trace.jsonl",
       includeMessages: true,
       includePrompt: true,
       includeSystem: true,
@@ -3433,7 +3433,7 @@ Notes:
 
 - `cli.banner.taglineMode` controls banner tagline style:
   - `"random"` (default): rotating funny/seasonal taglines.
-  - `"default"`: fixed neutral tagline (`All your chats, one OpenClaw.`).
+  - `"default"`: fixed neutral tagline (`All your chats, one Alvasta Pro.`).
   - `"off"`: no tagline text (banner title/version still shown).
 - To hide the entire banner (not just taglines), set env `OPENCLAW_HIDE_BANNER=1`.
 
@@ -3465,7 +3465,7 @@ See `agents.list` identity fields under [Agent defaults](#agent-defaults).
 
 ## Bridge (legacy, removed)
 
-Current builds no longer include the TCP bridge. Nodes connect over the Gateway WebSocket. `bridge.*` keys are no longer part of the config schema (validation fails until removed; `openclaw doctor --fix` can strip unknown keys).
+Current builds no longer include the TCP bridge. Nodes connect over the Gateway WebSocket. `bridge.*` keys are no longer part of the config schema (validation fails until removed; `alvasta-pro doctor --fix` can strip unknown keys).
 
 <Accordion title="Legacy bridge config (historical reference)">
 
@@ -3615,7 +3615,7 @@ Template placeholders expanded in `tools.media.models[].args`:
 Split config into multiple files:
 
 ```json5
-// ~/.openclaw/openclaw.json
+// ~/.alvasta-pro/alvasta-pro.json
 {
   gateway: { port: 18789 },
   agents: { $include: "./agents.json5" },
@@ -3631,7 +3631,7 @@ Split config into multiple files:
 - Array of files: deep-merged in order (later overrides earlier).
 - Sibling keys: merged after includes (override included values).
 - Nested includes: up to 10 levels deep.
-- Paths: resolved relative to the including file, but must stay inside the top-level config directory (`dirname` of `openclaw.json`). Absolute/`../` forms are allowed only when they still resolve inside that boundary.
+- Paths: resolved relative to the including file, but must stay inside the top-level config directory (`dirname` of `alvasta-pro.json`). Absolute/`../` forms are allowed only when they still resolve inside that boundary.
 - Errors: clear messages for missing files, parse errors, and circular includes.
 
 ---

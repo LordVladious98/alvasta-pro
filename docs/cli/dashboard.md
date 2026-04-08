@@ -1,18 +1,18 @@
 ---
-summary: "CLI reference for `openclaw dashboard` (open the Control UI)"
+summary: "CLI reference for `alvasta-pro dashboard` (open the Control UI)"
 read_when:
   - You want to open the Control UI with your current token
   - You want to print the URL without launching a browser
 title: "dashboard"
 ---
 
-# `openclaw dashboard`
+# `alvasta-pro dashboard`
 
 Open the Control UI using your current auth.
 
 ```bash
-openclaw dashboard
-openclaw dashboard --no-open
+alvasta-pro dashboard
+alvasta-pro dashboard --no-open
 ```
 
 Notes:

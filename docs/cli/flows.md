@@ -1,18 +1,18 @@
 ---
-summary: "Redirect: flow commands live under `openclaw tasks flow`"
+summary: "Redirect: flow commands live under `alvasta-pro tasks flow`"
 read_when:
-  - You encounter openclaw flows in older docs or release notes
+  - You encounter alvasta-pro flows in older docs or release notes
 title: "flows (redirect)"
 ---
 
-# `openclaw tasks flow`
+# `alvasta-pro tasks flow`
 
-Flow commands are subcommands of `openclaw tasks`, not a standalone `flows` command.
+Flow commands are subcommands of `alvasta-pro tasks`, not a standalone `flows` command.
 
 ```bash
-openclaw tasks flow list [--json]
-openclaw tasks flow show <lookup>
-openclaw tasks flow cancel <lookup>
+alvasta-pro tasks flow list [--json]
+alvasta-pro tasks flow show <lookup>
+alvasta-pro tasks flow cancel <lookup>
 ```
 
 For full documentation see [Task Flow](/automation/taskflow) and the [tasks CLI reference](/cli/index#tasks).

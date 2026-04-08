@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `openclaw agents` (list/add/delete/bindings/bind/unbind/set identity)"
+summary: "CLI reference for `alvasta-pro agents` (list/add/delete/bindings/bind/unbind/set identity)"
 read_when:
   - You want multiple isolated agents (workspaces + routing + auth)
 title: "agents"
 ---
 
-# `openclaw agents`
+# `alvasta-pro agents`
 
 Manage isolated agents (workspaces + auth + routing).
 
@@ -18,16 +18,16 @@ Related:
 ## Examples
 
 ```bash
-openclaw agents list
-openclaw agents list --bindings
-openclaw agents add work --workspace ~/.openclaw/workspace-work
-openclaw agents add ops --workspace ~/.openclaw/workspace-ops --bind telegram:ops --non-interactive
-openclaw agents bindings
-openclaw agents bind --agent work --bind telegram:ops
-openclaw agents unbind --agent work --bind telegram:ops
-openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
-openclaw agents set-identity --agent main --avatar avatars/openclaw.png
-openclaw agents delete work
+alvasta-pro agents list
+alvasta-pro agents list --bindings
+alvasta-pro agents add work --workspace ~/.alvasta-pro/workspace-work
+alvasta-pro agents add ops --workspace ~/.alvasta-pro/workspace-ops --bind telegram:ops --non-interactive
+alvasta-pro agents bindings
+alvasta-pro agents bind --agent work --bind telegram:ops
+alvasta-pro agents unbind --agent work --bind telegram:ops
+alvasta-pro agents set-identity --workspace ~/.alvasta-pro/workspace --from-identity
+alvasta-pro agents set-identity --agent main --avatar avatars/alvasta-pro.png
+alvasta-pro agents delete work
 ```
 
 ## Routing bindings
@@ -35,42 +35,42 @@ openclaw agents delete work
 Use routing bindings to pin inbound channel traffic to a specific agent.
 
 If you also want different visible skills per agent, configure
-`agents.defaults.skills` and `agents.list[].skills` in `openclaw.json`. See
+`agents.defaults.skills` and `agents.list[].skills` in `alvasta-pro.json`. See
 [Skills config](/tools/skills-config) and
 [Configuration Reference](/gateway/configuration-reference#agentsdefaultsskills).
 
 List bindings:
 
 ```bash
-openclaw agents bindings
-openclaw agents bindings --agent work
-openclaw agents bindings --json
+alvasta-pro agents bindings
+alvasta-pro agents bindings --agent work
+alvasta-pro agents bindings --json
 ```
 
 Add bindings:
 
 ```bash
-openclaw agents bind --agent work --bind telegram:ops --bind discord:guild-a
+alvasta-pro agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-If you omit `accountId` (`--bind <channel>`), OpenClaw resolves it from channel defaults and plugin setup hooks when available.
+If you omit `accountId` (`--bind <channel>`), Alvasta Pro resolves it from channel defaults and plugin setup hooks when available.
 
-If you omit `--agent` for `bind` or `unbind`, OpenClaw targets the current default agent.
+If you omit `--agent` for `bind` or `unbind`, Alvasta Pro targets the current default agent.
 
 ### Binding scope behavior
 
 - A binding without `accountId` matches the channel default account only.
 - `accountId: "*"` is the channel-wide fallback (all accounts) and is less specific than an explicit account binding.
-- If the same agent already has a matching channel binding without `accountId`, and you later bind with an explicit or resolved `accountId`, OpenClaw upgrades that existing binding in place instead of adding a duplicate.
+- If the same agent already has a matching channel binding without `accountId`, and you later bind with an explicit or resolved `accountId`, Alvasta Pro upgrades that existing binding in place instead of adding a duplicate.
 
 Example:
 
 ```bash
 # initial channel-only binding
-openclaw agents bind --agent work --bind telegram
+alvasta-pro agents bind --agent work --bind telegram
 
 # later upgrade to account-scoped binding
-openclaw agents bind --agent work --bind telegram:ops
+alvasta-pro agents bind --agent work --bind telegram:ops
 ```
 
 After the upgrade, routing for that binding is scoped to `telegram:ops`. If you also want default-account routing, add it explicitly (for example `--bind telegram:default`).
@@ -78,8 +78,8 @@ After the upgrade, routing for that binding is scoped to `telegram:ops`. If you 
 Remove bindings:
 
 ```bash
-openclaw agents unbind --agent work --bind telegram:ops
-openclaw agents unbind --agent work --all
+alvasta-pro agents unbind --agent work --bind telegram:ops
+alvasta-pro agents unbind --agent work --all
 ```
 
 `unbind` accepts either `--all` or one or more `--bind` values, not both.
@@ -88,7 +88,7 @@ openclaw agents unbind --agent work --all
 
 ### `agents`
 
-Running `openclaw agents` with no subcommand is equivalent to `openclaw agents list`.
+Running `alvasta-pro agents` with no subcommand is equivalent to `alvasta-pro agents list`.
 
 ### `agents list`
 
@@ -155,7 +155,7 @@ Notes:
 
 Each agent workspace can include an `IDENTITY.md` at the workspace root:
 
-- Example path: `~/.openclaw/workspace/IDENTITY.md`
+- Example path: `~/.alvasta-pro/workspace/IDENTITY.md`
 - `set-identity --from-identity` reads from the workspace root (or an explicit `--identity-file`)
 
 Avatar paths resolve relative to the workspace root.
@@ -190,13 +190,13 @@ Notes:
 Load from `IDENTITY.md`:
 
 ```bash
-openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
+alvasta-pro agents set-identity --workspace ~/.alvasta-pro/workspace --from-identity
 ```
 
 Override fields explicitly:
 
 ```bash
-openclaw agents set-identity --agent main --name "OpenClaw" --emoji "🦞" --avatar avatars/openclaw.png
+alvasta-pro agents set-identity --agent main --name "Alvasta Pro" --emoji "🦞" --avatar avatars/alvasta-pro.png
 ```
 
 Config sample:
@@ -208,10 +208,10 @@ Config sample:
       {
         id: "main",
         identity: {
-          name: "OpenClaw",
+          name: "Alvasta Pro",
           theme: "space lobster",
           emoji: "🦞",
-          avatar: "avatars/openclaw.png",
+          avatar: "avatars/alvasta-pro.png",
         },
       },
     ],

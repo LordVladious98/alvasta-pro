@@ -1,7 +1,7 @@
 ---
-summary: "Shared Docker VM runtime steps for long-lived OpenClaw Gateway hosts"
+summary: "Shared Docker VM runtime steps for long-lived Alvasta Pro Gateway hosts"
 read_when:
-  - You are deploying OpenClaw on a cloud VM with Docker
+  - You are deploying Alvasta Pro on a cloud VM with Docker
   - You need the shared binary bake, persistence, and update flow
 title: "Docker VM Runtime"
 ---
@@ -79,7 +79,7 @@ The download URLs above are for x86_64 (amd64). For ARM-based VMs (e.g. Hetzner 
 
 ```bash
 docker compose build
-docker compose up -d openclaw-gateway
+docker compose up -d alvasta-pro-gateway
 ```
 
 If build fails with `Killed` or `exit code 137` during `pnpm install --frozen-lockfile`, the VM is out of memory.
@@ -88,9 +88,9 @@ Use a larger machine class before retrying.
 Verify binaries:
 
 ```bash
-docker compose exec openclaw-gateway which gog
-docker compose exec openclaw-gateway which goplaces
-docker compose exec openclaw-gateway which wacli
+docker compose exec alvasta-pro-gateway which gog
+docker compose exec alvasta-pro-gateway which goplaces
+docker compose exec alvasta-pro-gateway which wacli
 ```
 
 Expected output:
@@ -104,7 +104,7 @@ Expected output:
 Verify Gateway:
 
 ```bash
-docker compose logs -f openclaw-gateway
+docker compose logs -f alvasta-pro-gateway
 ```
 
 Expected output:
@@ -115,17 +115,17 @@ Expected output:
 
 ## What persists where
 
-OpenClaw runs in Docker, but Docker is not the source of truth.
+Alvasta Pro runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
 | Component           | Location                          | Persistence mechanism  | Notes                                                         |
 | ------------------- | --------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| Gateway config      | `/home/node/.openclaw/`           | Host volume mount      | Includes `openclaw.json`, `.env`                              |
-| Model auth profiles | `/home/node/.openclaw/agents/`    | Host volume mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
-| Skill configs       | `/home/node/.openclaw/skills/`    | Host volume mount      | Skill-level state                                             |
-| Agent workspace     | `/home/node/.openclaw/workspace/` | Host volume mount      | Code and agent artifacts                                      |
-| WhatsApp session    | `/home/node/.openclaw/`           | Host volume mount      | Preserves QR login                                            |
-| Gmail keyring       | `/home/node/.openclaw/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`                               |
+| Gateway config      | `/home/node/.alvasta-pro/`           | Host volume mount      | Includes `alvasta-pro.json`, `.env`                              |
+| Model auth profiles | `/home/node/.alvasta-pro/agents/`    | Host volume mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
+| Skill configs       | `/home/node/.alvasta-pro/skills/`    | Host volume mount      | Skill-level state                                             |
+| Agent workspace     | `/home/node/.alvasta-pro/workspace/` | Host volume mount      | Code and agent artifacts                                      |
+| WhatsApp session    | `/home/node/.alvasta-pro/`           | Host volume mount      | Preserves QR login                                            |
+| Gmail keyring       | `/home/node/.alvasta-pro/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`                               |
 | External binaries   | `/usr/local/bin/`                 | Docker image           | Must be baked at build time                                   |
 | Node runtime        | Container filesystem              | Docker image           | Rebuilt every image build                                     |
 | OS packages         | Container filesystem              | Docker image           | Do not install at runtime                                     |
@@ -133,7 +133,7 @@ All long-lived state must survive restarts, rebuilds, and reboots.
 
 ## Updates
 
-To update OpenClaw on the VM:
+To update Alvasta Pro on the VM:
 
 ```bash
 git pull

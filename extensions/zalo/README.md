@@ -1,17 +1,17 @@
-# @openclaw/zalo
+# @alvasta-pro/zalo
 
-Zalo channel plugin for OpenClaw (Bot API).
+Zalo channel plugin for Alvasta Pro (Bot API).
 
 ## Install (local checkout)
 
 ```bash
-openclaw plugins install ./path/to/local/zalo-plugin
+alvasta-pro plugins install ./path/to/local/zalo-plugin
 ```
 
 ## Install (npm)
 
 ```bash
-openclaw plugins install @openclaw/zalo
+alvasta-pro plugins install @alvasta-pro/zalo
 ```
 
 Onboarding: select Zalo and confirm the install prompt to fetch the plugin automatically.

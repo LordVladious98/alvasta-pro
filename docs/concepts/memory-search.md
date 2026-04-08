@@ -47,7 +47,7 @@ node-llama-cpp).
 
 ## How search works
 
-OpenClaw runs two retrieval paths in parallel and merges the results:
+Alvasta Pro runs two retrieval paths in parallel and merges the results:
 
 ```mermaid
 flowchart LR
@@ -61,7 +61,7 @@ flowchart LR
 ```
 
 - **Vector search** finds notes with similar meaning ("gateway host" matches
-  "the machine running OpenClaw").
+  "the machine running Alvasta Pro").
 - **BM25 keyword search** finds exact matches (IDs, error strings, config
   keys).
 
@@ -127,14 +127,14 @@ earlier conversations. This is opt-in via
 
 ## Troubleshooting
 
-**No results?** Run `openclaw memory status` to check the index. If empty, run
-`openclaw memory index --force`.
+**No results?** Run `alvasta-pro memory status` to check the index. If empty, run
+`alvasta-pro memory index --force`.
 
 **Only keyword matches?** Your embedding provider may not be configured. Check
-`openclaw memory status --deep`.
+`alvasta-pro memory status --deep`.
 
 **CJK text not found?** Rebuild the FTS index with
-`openclaw memory index --force`.
+`alvasta-pro memory index --force`.
 
 ## Further reading
 

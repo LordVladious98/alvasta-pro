@@ -35,7 +35,7 @@ Status: production-ready for DMs + channels via Slack app integrations. Default 
         - install app and copy the **Bot Token** (`xoxb-...`) shown
       </Step>
 
-      <Step title="Configure OpenClaw">
+      <Step title="Configure Alvasta Pro">
 
 ```json5
 {
@@ -62,7 +62,7 @@ SLACK_BOT_TOKEN=xoxb-...
       <Step title="Start gateway">
 
 ```bash
-openclaw gateway
+alvasta-pro gateway
 ```
 
       </Step>
@@ -82,7 +82,7 @@ openclaw gateway
 
       </Step>
 
-      <Step title="Configure OpenClaw">
+      <Step title="Configure Alvasta Pro">
 
 ```json5
 {
@@ -109,7 +109,7 @@ openclaw gateway
       <Step title="Start gateway">
 
 ```bash
-openclaw gateway
+alvasta-pro gateway
 ```
 
       </Step>
@@ -126,12 +126,12 @@ openclaw gateway
 ```json
 {
   "display_information": {
-    "name": "OpenClaw",
-    "description": "Slack connector for OpenClaw"
+    "name": "Alvasta Pro",
+    "description": "Slack connector for Alvasta Pro"
   },
   "features": {
     "bot_user": {
-      "display_name": "OpenClaw",
+      "display_name": "Alvasta Pro",
       "always_online": true
     },
     "app_home": {
@@ -140,8 +140,8 @@ openclaw gateway
     },
     "slash_commands": [
       {
-        "command": "/openclaw",
-        "description": "Send a message to OpenClaw",
+        "command": "/alvasta-pro",
+        "description": "Send a message to Alvasta Pro",
         "should_escape": false
       }
     ]
@@ -203,12 +203,12 @@ openclaw gateway
 ```json
 {
   "display_information": {
-    "name": "OpenClaw",
-    "description": "Slack connector for OpenClaw"
+    "name": "Alvasta Pro",
+    "description": "Slack connector for Alvasta Pro"
   },
   "features": {
     "bot_user": {
-      "display_name": "OpenClaw",
+      "display_name": "Alvasta Pro",
       "always_online": true
     },
     "app_home": {
@@ -217,8 +217,8 @@ openclaw gateway
     },
     "slash_commands": [
       {
-        "command": "/openclaw",
-        "description": "Send a message to OpenClaw",
+        "command": "/alvasta-pro",
+        "description": "Send a message to Alvasta Pro",
         "should_escape": false,
         "url": "https://gateway-host.example.com/slack/events"
       }
@@ -369,7 +369,7 @@ Current Slack message actions include `send`, `upload-file`, `download-file`, `r
     - Named accounts inherit `channels.slack.allowFrom` when their own `allowFrom` is unset.
     - Named accounts do not inherit `channels.slack.accounts.default.allowFrom`.
 
-    Pairing in DMs uses `openclaw pairing approve slack <code>`.
+    Pairing in DMs uses `alvasta-pro pairing approve slack <code>`.
 
   </Tab>
 
@@ -440,7 +440,7 @@ Note: `replyToMode="off"` disables **all** reply threading in Slack, including e
 
 ## Ack reactions
 
-`ackReaction` sends an acknowledgement emoji while OpenClaw is processing an inbound message.
+`ackReaction` sends an acknowledgement emoji while Alvasta Pro is processing an inbound message.
 
 Resolution order:
 
@@ -467,7 +467,7 @@ Notes:
 
 - A reply thread must be available for native text streaming to appear. Thread selection still follows `replyToMode`. Without one, the normal draft preview is used.
 - Media and non-text payloads fall back to normal delivery.
-- If streaming fails mid-reply, OpenClaw falls back to normal delivery for remaining payloads.
+- If streaming fails mid-reply, Alvasta Pro falls back to normal delivery for remaining payloads.
 
 Use draft preview instead of Slack native text streaming:
 
@@ -489,7 +489,7 @@ Legacy keys:
 
 ## Typing reaction fallback
 
-`typingReaction` adds a temporary reaction to the inbound Slack message while OpenClaw is processing a reply, then removes it when the run finishes. This is most useful outside of thread replies, which use a default "is typing..." status indicator.
+`typingReaction` adds a temporary reaction to the inbound Slack message while Alvasta Pro is processing a reply, then removes it when the run finishes. This is most useful outside of thread replies, which use a default "is typing..." status indicator.
 
 Resolution order:
 
@@ -546,7 +546,7 @@ Notes:
 Default slash command settings:
 
 - `enabled: false`
-- `name: "openclaw"`
+- `name: "alvasta-pro"`
 - `sessionPrefix: "slack:slash"`
 - `ephemeral: true`
 
@@ -602,8 +602,8 @@ These directives compile into Slack Block Kit and route clicks or selections bac
 Notes:
 
 - This is Slack-specific UI. Other channels do not translate Slack Block Kit directives into their own button systems.
-- The interactive callback values are OpenClaw-generated opaque tokens, not raw agent-authored values.
-- If generated interactive blocks would exceed Slack Block Kit limits, OpenClaw falls back to the original text reply instead of sending an invalid blocks payload.
+- The interactive callback values are Alvasta Pro-generated opaque tokens, not raw agent-authored values.
+- If generated interactive blocks would exceed Slack Block Kit limits, Alvasta Pro falls back to the original text reply instead of sending an invalid blocks payload.
 
 ## Exec approvals in Slack
 
@@ -614,7 +614,7 @@ Slack can act as a native approval client with interactive buttons and interacti
 - Approver authorization is still enforced: only users identified as approvers can approve or deny requests through Slack.
 
 This uses the same shared approval button surface as other channels. When `interactivity` is enabled in your Slack app settings, approval prompts render as Block Kit buttons directly in the conversation.
-When those buttons are present, they are the primary approval UX; OpenClaw
+When those buttons are present, they are the primary approval UX; Alvasta Pro
 should only include a manual `/approve` command when the tool result says chat
 approvals are unavailable or manual approval is the only path.
 
@@ -704,9 +704,9 @@ Primary reference:
     Useful commands:
 
 ```bash
-openclaw channels status --probe
-openclaw logs --follow
-openclaw doctor
+alvasta-pro channels status --probe
+alvasta-pro logs --follow
+alvasta-pro doctor
 ```
 
   </Accordion>
@@ -719,7 +719,7 @@ openclaw doctor
     - pairing approvals / allowlist entries
 
 ```bash
-openclaw pairing list slack
+alvasta-pro pairing list slack
 ```
 
   </Accordion>
@@ -727,7 +727,7 @@ openclaw pairing list slack
   <Accordion title="Socket mode not connecting">
     Validate bot + app tokens and Socket Mode enablement in Slack app settings.
 
-    If `openclaw channels status --probe --json` shows `botTokenStatus` or
+    If `alvasta-pro channels status --probe --json` shows `botTokenStatus` or
     `appTokenStatus: "configured_unavailable"`, the Slack account is
     configured but the current runtime could not resolve the SecretRef-backed
     value.

@@ -9,7 +9,7 @@ title: "QA E2E Automation"
 
 # QA E2E Automation
 
-The private QA stack is meant to exercise OpenClaw in a more realistic,
+The private QA stack is meant to exercise Alvasta Pro in a more realistic,
 channel-shaped way than a single unit test can.
 
 Current pieces:
@@ -41,7 +41,7 @@ For faster QA Lab UI iteration without rebuilding the Docker image each time,
 start the stack with a bind-mounted QA Lab bundle:
 
 ```bash
-pnpm openclaw qa docker-build-image
+pnpm alvasta-pro qa docker-build-image
 pnpm qa:lab:build
 pnpm qa:lab:up:fast
 pnpm qa:lab:watch

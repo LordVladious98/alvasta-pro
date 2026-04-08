@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `openclaw node` (headless node host)"
+summary: "CLI reference for `alvasta-pro node` (headless node host)"
 read_when:
   - Running the headless node host
   - Pairing a non-macOS node for system.run
 title: "node"
 ---
 
-# `openclaw node`
+# `alvasta-pro node`
 
 Run a **headless node host** that connects to the Gateway WebSocket and exposes
 `system.run` / `system.which` on this machine.
@@ -51,7 +51,7 @@ Disable it on the node if needed:
 ## Run (foreground)
 
 ```bash
-openclaw node run --host <gateway-host> --port 18789
+alvasta-pro node run --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -65,7 +65,7 @@ Options:
 
 ## Gateway auth for node host
 
-`openclaw node run` and `openclaw node install` resolve gateway auth from config/env (no `--token`/`--password` flags on node commands):
+`alvasta-pro node run` and `alvasta-pro node install` resolve gateway auth from config/env (no `--token`/`--password` flags on node commands):
 
 - `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD` are checked first.
 - Then local config fallback: `gateway.auth.token` / `gateway.auth.password`.
@@ -79,7 +79,7 @@ Options:
 Install a headless node host as a user service.
 
 ```bash
-openclaw node install --host <gateway-host> --port 18789
+alvasta-pro node install --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -96,13 +96,13 @@ Options:
 Manage the service:
 
 ```bash
-openclaw node status
-openclaw node stop
-openclaw node restart
-openclaw node uninstall
+alvasta-pro node status
+alvasta-pro node stop
+alvasta-pro node restart
+alvasta-pro node uninstall
 ```
 
-Use `openclaw node run` for a foreground node host (no service).
+Use `alvasta-pro node run` for a foreground node host (no service).
 
 Service commands accept `--json` for machine-readable output.
 
@@ -112,26 +112,26 @@ The first connection creates a pending device pairing request (`role: node`) on 
 Approve it via:
 
 ```bash
-openclaw devices list
-openclaw devices approve <requestId>
+alvasta-pro devices list
+alvasta-pro devices approve <requestId>
 ```
 
 If the node retries pairing with changed auth details (role/scopes/public key),
 the previous pending request is superseded and a new `requestId` is created.
-Run `openclaw devices list` again before approval.
+Run `alvasta-pro devices list` again before approval.
 
 The node host stores its node id, token, display name, and gateway connection info in
-`~/.openclaw/node.json`.
+`~/.alvasta-pro/node.json`.
 
 ## Exec approvals
 
 `system.run` is gated by local exec approvals:
 
-- `~/.openclaw/exec-approvals.json`
+- `~/.alvasta-pro/exec-approvals.json`
 - [Exec approvals](/tools/exec-approvals)
-- `openclaw approvals --node <id|name|ip>` (edit from the Gateway)
+- `alvasta-pro approvals --node <id|name|ip>` (edit from the Gateway)
 
-For approved async node exec, OpenClaw prepares a canonical `systemRunPlan`
+For approved async node exec, Alvasta Pro prepares a canonical `systemRunPlan`
 before prompting. The later approved `system.run` forward reuses that stored
 plan, so edits to command/cwd/session fields after the approval request was
 created are rejected instead of changing what the node executes.

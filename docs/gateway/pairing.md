@@ -37,11 +37,11 @@ Pending requests expire automatically after **5 minutes**.
 ## CLI workflow (headless friendly)
 
 ```bash
-openclaw nodes pending
-openclaw nodes approve <requestId>
-openclaw nodes reject <requestId>
-openclaw nodes status
-openclaw nodes rename --node <id|name|ip> --name "Living Room iPad"
+alvasta-pro nodes pending
+alvasta-pro nodes approve <requestId>
+alvasta-pro nodes reject <requestId>
+alvasta-pro nodes status
+alvasta-pro nodes rename --node <id|name|ip> --name "Living Room iPad"
 ```
 
 `nodes status` shows paired/connected nodes and their capabilities.
@@ -119,10 +119,10 @@ If silent approval fails, it falls back to the normal “Approve/Reject” promp
 
 ## Storage (local, private)
 
-Pairing state is stored under the Gateway state directory (default `~/.openclaw`):
+Pairing state is stored under the Gateway state directory (default `~/.alvasta-pro`):
 
-- `~/.openclaw/nodes/paired.json`
-- `~/.openclaw/nodes/pending.json`
+- `~/.alvasta-pro/nodes/paired.json`
+- `~/.alvasta-pro/nodes/pending.json`
 
 If you override `OPENCLAW_STATE_DIR`, the `nodes/` folder moves with it.
 

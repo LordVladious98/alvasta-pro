@@ -1,30 +1,30 @@
 ---
-summary: "CLI reference for `openclaw devices` (device pairing + token rotation/revocation)"
+summary: "CLI reference for `alvasta-pro devices` (device pairing + token rotation/revocation)"
 read_when:
   - You are approving device pairing requests
   - You need to rotate or revoke device tokens
 title: "devices"
 ---
 
-# `openclaw devices`
+# `alvasta-pro devices`
 
 Manage device pairing requests and device-scoped tokens.
 
 ## Commands
 
-### `openclaw devices list`
+### `alvasta-pro devices list`
 
 List pending pairing requests and paired devices.
 
 ```
-openclaw devices list
-openclaw devices list --json
+alvasta-pro devices list
+alvasta-pro devices list --json
 ```
 
 Pending request output includes the requested role and scopes so approvals can
 be reviewed before you approve.
 
-### `openclaw devices remove <deviceId>`
+### `alvasta-pro devices remove <deviceId>`
 
 Remove one paired device entry.
 
@@ -33,45 +33,45 @@ remove only **their own** device entry. Removing some other device requires
 `operator.admin`.
 
 ```
-openclaw devices remove <deviceId>
-openclaw devices remove <deviceId> --json
+alvasta-pro devices remove <deviceId>
+alvasta-pro devices remove <deviceId> --json
 ```
 
-### `openclaw devices clear --yes [--pending]`
+### `alvasta-pro devices clear --yes [--pending]`
 
 Clear paired devices in bulk.
 
 ```
-openclaw devices clear --yes
-openclaw devices clear --yes --pending
-openclaw devices clear --yes --pending --json
+alvasta-pro devices clear --yes
+alvasta-pro devices clear --yes --pending
+alvasta-pro devices clear --yes --pending --json
 ```
 
-### `openclaw devices approve [requestId] [--latest]`
+### `alvasta-pro devices approve [requestId] [--latest]`
 
-Approve a pending device pairing request. If `requestId` is omitted, OpenClaw
+Approve a pending device pairing request. If `requestId` is omitted, Alvasta Pro
 automatically approves the most recent pending request.
 
 Note: if a device retries pairing with changed auth details (role/scopes/public
-key), OpenClaw supersedes the previous pending entry and issues a new
-`requestId`. Run `openclaw devices list` right before approval to use the
+key), Alvasta Pro supersedes the previous pending entry and issues a new
+`requestId`. Run `alvasta-pro devices list` right before approval to use the
 current ID.
 
 ```
-openclaw devices approve
-openclaw devices approve <requestId>
-openclaw devices approve --latest
+alvasta-pro devices approve
+alvasta-pro devices approve <requestId>
+alvasta-pro devices approve --latest
 ```
 
-### `openclaw devices reject <requestId>`
+### `alvasta-pro devices reject <requestId>`
 
 Reject a pending device pairing request.
 
 ```
-openclaw devices reject <requestId>
+alvasta-pro devices reject <requestId>
 ```
 
-### `openclaw devices rotate --device <id> --role <role> [--scope <scope...>]`
+### `alvasta-pro devices rotate --device <id> --role <role> [--scope <scope...>]`
 
 Rotate a device token for a specific role (optionally updating scopes).
 The target role must already exist in that device's approved pairing contract;
@@ -85,12 +85,12 @@ operator scopes; rotation cannot mint a broader operator token than the caller
 already has.
 
 ```
-openclaw devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
+alvasta-pro devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
 Returns the new token payload as JSON.
 
-### `openclaw devices revoke --device <id> --role <role>`
+### `alvasta-pro devices revoke --device <id> --role <role>`
 
 Revoke a device token for a specific role.
 
@@ -98,7 +98,7 @@ Non-admin paired-device callers can revoke only their **own** device token.
 Revoking some other device's token requires `operator.admin`.
 
 ```
-openclaw devices revoke --device <deviceId> --role node
+alvasta-pro devices revoke --device <deviceId> --role node
 ```
 
 Returns the revoke result as JSON.
@@ -135,27 +135,27 @@ Use this when Control UI or other clients keep failing with `AUTH_TOKEN_MISMATCH
 1. Confirm current gateway token source:
 
 ```bash
-openclaw config get gateway.auth.token
+alvasta-pro config get gateway.auth.token
 ```
 
 2. List paired devices and identify the affected device id:
 
 ```bash
-openclaw devices list
+alvasta-pro devices list
 ```
 
 3. Rotate operator token for the affected device:
 
 ```bash
-openclaw devices rotate --device <deviceId> --role operator
+alvasta-pro devices rotate --device <deviceId> --role operator
 ```
 
 4. If rotation is not enough, remove stale pairing and approve again:
 
 ```bash
-openclaw devices remove <deviceId>
-openclaw devices list
-openclaw devices approve <requestId>
+alvasta-pro devices remove <deviceId>
+alvasta-pro devices list
+alvasta-pro devices approve <requestId>
 ```
 
 5. Retry client connection with the current shared token/password.

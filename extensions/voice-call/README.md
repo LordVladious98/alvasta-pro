@@ -1,6 +1,6 @@
-# @openclaw/voice-call
+# @alvasta-pro/voice-call
 
-Official Voice Call plugin for **OpenClaw**.
+Official Voice Call plugin for **Alvasta Pro**.
 
 Providers:
 
@@ -9,15 +9,15 @@ Providers:
 - **Plivo** (Voice API + XML transfer + GetInput speech)
 - **Mock** (dev/no network)
 
-Docs: `https://docs.openclaw.ai/plugins/voice-call`
-Plugin system: `https://docs.openclaw.ai/plugin`
+Docs: `https://docs.alvasta-pro.ai/plugins/voice-call`
+Plugin system: `https://docs.alvasta-pro.ai/plugin`
 
 ## Install (local dev)
 
-### Option A: install via OpenClaw (recommended)
+### Option A: install via Alvasta Pro (recommended)
 
 ```bash
-openclaw plugins install @openclaw/voice-call
+alvasta-pro plugins install @alvasta-pro/voice-call
 ```
 
 Restart the Gateway afterwards.
@@ -25,7 +25,7 @@ Restart the Gateway afterwards.
 ### Option B: copy into your global extensions folder (dev)
 
 ```bash
-PLUGIN_HOME=~/.openclaw/extensions
+PLUGIN_HOME=~/.alvasta-pro/extensions
 mkdir -p "$PLUGIN_HOME"
 cp -R <local-plugin-checkout> "$PLUGIN_HOME/voice-call"
 cd "$PLUGIN_HOME/voice-call" && pnpm install
@@ -98,31 +98,31 @@ Notes:
 - Twilio/Telnyx/Plivo require a **publicly reachable** webhook URL.
 - `mock` is a local dev provider (no network calls).
 - Telnyx requires `telnyx.publicKey` (or `TELNYX_PUBLIC_KEY`) unless `skipSignatureVerification` is true.
-- If older configs still use `provider: "log"`, `twilio.from`, or legacy `streaming.*` OpenAI keys, run `openclaw doctor --fix` to rewrite them.
-- advanced webhook, streaming, and tunnel notes: `https://docs.openclaw.ai/plugins/voice-call`
+- If older configs still use `provider: "log"`, `twilio.from`, or legacy `streaming.*` OpenAI keys, run `alvasta-pro doctor --fix` to rewrite them.
+- advanced webhook, streaming, and tunnel notes: `https://docs.alvasta-pro.ai/plugins/voice-call`
 - `responseModel` is optional. When unset, voice responses use the runtime default model.
 
 ## Stale call reaper
 
 See the plugin docs for recommended ranges and production examples:
-`https://docs.openclaw.ai/plugins/voice-call#stale-call-reaper`
+`https://docs.alvasta-pro.ai/plugins/voice-call#stale-call-reaper`
 
 ## TTS for calls
 
 Voice Call uses the core `messages.tts` configuration for
 streaming speech on calls. Override examples and provider caveats live here:
-`https://docs.openclaw.ai/plugins/voice-call#tts-for-calls`
+`https://docs.alvasta-pro.ai/plugins/voice-call#tts-for-calls`
 
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall continue --call-id <id> --message "Any questions?"
-openclaw voicecall speak --call-id <id> --message "One moment"
-openclaw voicecall end --call-id <id>
-openclaw voicecall status --call-id <id>
-openclaw voicecall tail
-openclaw voicecall expose --mode funnel
+alvasta-pro voicecall call --to "+15555550123" --message "Hello from Alvasta Pro"
+alvasta-pro voicecall continue --call-id <id> --message "Any questions?"
+alvasta-pro voicecall speak --call-id <id> --message "One moment"
+alvasta-pro voicecall end --call-id <id>
+alvasta-pro voicecall status --call-id <id>
+alvasta-pro voicecall tail
+alvasta-pro voicecall expose --mode funnel
 ```
 
 ## Tool

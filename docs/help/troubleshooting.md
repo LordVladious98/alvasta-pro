@@ -1,7 +1,7 @@
 ---
-summary: "Symptom first troubleshooting hub for OpenClaw"
+summary: "Symptom first troubleshooting hub for Alvasta Pro"
 read_when:
-  - OpenClaw is not working and you need the fastest path to a fix
+  - Alvasta Pro is not working and you need the fastest path to a fix
   - You want a triage flow before diving into deep runbooks
 title: "General Troubleshooting"
 ---
@@ -15,26 +15,26 @@ If you only have 2 minutes, use this page as a triage front door.
 Run this exact ladder in order:
 
 ```bash
-openclaw status
-openclaw status --all
-openclaw gateway probe
-openclaw gateway status
-openclaw doctor
-openclaw channels status --probe
-openclaw logs --follow
+alvasta-pro status
+alvasta-pro status --all
+alvasta-pro gateway probe
+alvasta-pro gateway status
+alvasta-pro doctor
+alvasta-pro channels status --probe
+alvasta-pro logs --follow
 ```
 
 Good output in one line:
 
-- `openclaw status` → shows configured channels and no obvious auth errors.
-- `openclaw status --all` → full report is present and shareable.
-- `openclaw gateway probe` → expected gateway target is reachable (`Reachable: yes`). `RPC: limited - missing scope: operator.read` is degraded diagnostics, not a connect failure.
-- `openclaw gateway status` → `Runtime: running` and `RPC probe: ok`.
-- `openclaw doctor` → no blocking config/service errors.
-- `openclaw channels status --probe` → reachable gateway returns live per-account
+- `alvasta-pro status` → shows configured channels and no obvious auth errors.
+- `alvasta-pro status --all` → full report is present and shareable.
+- `alvasta-pro gateway probe` → expected gateway target is reachable (`Reachable: yes`). `RPC: limited - missing scope: operator.read` is degraded diagnostics, not a connect failure.
+- `alvasta-pro gateway status` → `Runtime: running` and `RPC probe: ok`.
+- `alvasta-pro doctor` → no blocking config/service errors.
+- `alvasta-pro channels status --probe` → reachable gateway returns live per-account
   transport state plus probe/audit results such as `works` or `audit ok`; if the
   gateway is unreachable, the command falls back to config-only summaries.
-- `openclaw logs --follow` → steady activity, no repeating fatal errors.
+- `alvasta-pro logs --follow` → steady activity, no repeating fatal errors.
 
 ## Anthropic long context 429
 
@@ -42,24 +42,24 @@ If you see:
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`,
 go to [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
 
-## Plugin install fails with missing openclaw extensions
+## Plugin install fails with missing alvasta-pro extensions
 
-If install fails with `package.json missing openclaw.extensions`, the plugin package
-is using an old shape that OpenClaw no longer accepts.
+If install fails with `package.json missing alvasta-pro.extensions`, the plugin package
+is using an old shape that Alvasta Pro no longer accepts.
 
 Fix in the plugin package:
 
-1. Add `openclaw.extensions` to `package.json`.
+1. Add `alvasta-pro.extensions` to `package.json`.
 2. Point entries at built runtime files (usually `./dist/index.js`).
-3. Republish the plugin and run `openclaw plugins install <package>` again.
+3. Republish the plugin and run `alvasta-pro plugins install <package>` again.
 
 Example:
 
 ```json
 {
-  "name": "@openclaw/my-plugin",
+  "name": "@alvasta-pro/my-plugin",
   "version": "1.2.3",
-  "openclaw": {
+  "alvasta-pro": {
     "extensions": ["./dist/index.js"]
   }
 }
@@ -71,7 +71,7 @@ Reference: [Plugin architecture](/plugins/architecture)
 
 ```mermaid
 flowchart TD
-  A[OpenClaw is not working] --> B{What breaks first}
+  A[Alvasta Pro is not working] --> B{What breaks first}
   B --> C[No replies]
   B --> D[Dashboard or Control UI will not connect]
   B --> E[Gateway will not start or service not running]
@@ -92,11 +92,11 @@ flowchart TD
 <AccordionGroup>
   <Accordion title="No replies">
     ```bash
-    openclaw status
-    openclaw gateway status
-    openclaw channels status --probe
-    openclaw pairing list --channel <channel> [--account <id>]
-    openclaw logs --follow
+    alvasta-pro status
+    alvasta-pro gateway status
+    alvasta-pro channels status --probe
+    alvasta-pro pairing list --channel <channel> [--account <id>]
+    alvasta-pro logs --follow
     ```
 
     Good output looks like:
@@ -122,16 +122,16 @@ flowchart TD
 
   <Accordion title="Dashboard or Control UI will not connect">
     ```bash
-    openclaw status
-    openclaw gateway status
-    openclaw logs --follow
-    openclaw doctor
-    openclaw channels status --probe
+    alvasta-pro status
+    alvasta-pro gateway status
+    alvasta-pro logs --follow
+    alvasta-pro doctor
+    alvasta-pro channels status --probe
     ```
 
     Good output looks like:
 
-    - `Dashboard: http://...` is shown in `openclaw gateway status`
+    - `Dashboard: http://...` is shown in `alvasta-pro gateway status`
     - `RPC probe: ok`
     - No auth loop in logs
 
@@ -163,11 +163,11 @@ flowchart TD
 
   <Accordion title="Gateway will not start or service installed but not running">
     ```bash
-    openclaw status
-    openclaw gateway status
-    openclaw logs --follow
-    openclaw doctor
-    openclaw channels status --probe
+    alvasta-pro status
+    alvasta-pro gateway status
+    alvasta-pro logs --follow
+    alvasta-pro doctor
+    alvasta-pro channels status --probe
     ```
 
     Good output looks like:
@@ -192,11 +192,11 @@ flowchart TD
 
   <Accordion title="Channel connects but messages do not flow">
     ```bash
-    openclaw status
-    openclaw gateway status
-    openclaw logs --follow
-    openclaw doctor
-    openclaw channels status --probe
+    alvasta-pro status
+    alvasta-pro gateway status
+    alvasta-pro logs --follow
+    alvasta-pro doctor
+    alvasta-pro channels status --probe
     ```
 
     Good output looks like:
@@ -220,12 +220,12 @@ flowchart TD
 
   <Accordion title="Cron or heartbeat did not fire or did not deliver">
     ```bash
-    openclaw status
-    openclaw gateway status
-    openclaw cron status
-    openclaw cron list
-    openclaw cron runs --id <jobId> --limit 20
-    openclaw logs --follow
+    alvasta-pro status
+    alvasta-pro gateway status
+    alvasta-pro cron status
+    alvasta-pro cron list
+    alvasta-pro cron runs --id <jobId> --limit 20
+    alvasta-pro logs --follow
     ```
 
     Good output looks like:
@@ -253,11 +253,11 @@ flowchart TD
 
     <Accordion title="Node is paired but tool fails camera canvas screen exec">
       ```bash
-      openclaw status
-      openclaw gateway status
-      openclaw nodes status
-      openclaw nodes describe --node <idOrNameOrIp>
-      openclaw logs --follow
+      alvasta-pro status
+      alvasta-pro gateway status
+      alvasta-pro nodes status
+      alvasta-pro nodes describe --node <idOrNameOrIp>
+      alvasta-pro logs --follow
       ```
 
       Good output looks like:
@@ -283,10 +283,10 @@ flowchart TD
 
     <Accordion title="Exec suddenly asks for approval">
       ```bash
-      openclaw config get tools.exec.host
-      openclaw config get tools.exec.security
-      openclaw config get tools.exec.ask
-      openclaw gateway restart
+      alvasta-pro config get tools.exec.host
+      alvasta-pro config get tools.exec.security
+      alvasta-pro config get tools.exec.ask
+      alvasta-pro gateway restart
       ```
 
       What changed:
@@ -301,10 +301,10 @@ flowchart TD
       Restore current default no-approval behavior:
 
       ```bash
-      openclaw config set tools.exec.host gateway
-      openclaw config set tools.exec.security full
-      openclaw config set tools.exec.ask off
-      openclaw gateway restart
+      alvasta-pro config set tools.exec.host gateway
+      alvasta-pro config set tools.exec.security full
+      alvasta-pro config set tools.exec.ask off
+      alvasta-pro gateway restart
       ```
 
       Safer alternatives:
@@ -329,17 +329,17 @@ flowchart TD
 
     <Accordion title="Browser tool fails">
       ```bash
-      openclaw status
-      openclaw gateway status
-      openclaw browser status
-      openclaw logs --follow
-      openclaw doctor
+      alvasta-pro status
+      alvasta-pro gateway status
+      alvasta-pro browser status
+      alvasta-pro logs --follow
+      alvasta-pro doctor
       ```
 
       Good output looks like:
 
       - Browser status shows `running: true` and a chosen browser/profile.
-      - `openclaw` starts, or `user` can see local Chrome tabs.
+      - `alvasta-pro` starts, or `user` can see local Chrome tabs.
 
       Common log signatures:
 
@@ -351,7 +351,7 @@ flowchart TD
       - `No Chrome tabs found for profile="user"` → the Chrome MCP attach profile has no open local Chrome tabs.
       - `Remote CDP for profile "<name>" is not reachable` → the configured remote CDP endpoint is not reachable from this host.
       - `Browser attachOnly is enabled ... not reachable` or `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profile has no live CDP target.
-      - stale viewport / dark-mode / locale / offline overrides on attach-only or remote CDP profiles → run `openclaw browser stop --browser-profile <name>` to close the active control session and release emulation state without restarting the gateway.
+      - stale viewport / dark-mode / locale / offline overrides on attach-only or remote CDP profiles → run `alvasta-pro browser stop --browser-profile <name>` to close the active control session and release emulation state without restarting the gateway.
 
       Deep pages:
 

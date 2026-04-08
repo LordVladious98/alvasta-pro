@@ -20,15 +20,15 @@ The key incremental move is to run two modes in parallel for a while:
 
 | Mode        | Import shape             | Who uses it                          | Enforcement                                  |
 | ----------- | ------------------------ | ------------------------------------ | -------------------------------------------- |
-| Legacy mode | `openclaw/plugin-sdk/*`  | all existing non-opted-in extensions | current permissive behavior remains          |
-| Opt-in mode | `@openclaw/plugin-sdk/*` | first-wave extensions only           | package-local `rootDir` + project references |
+| Legacy mode | `alvasta-pro/plugin-sdk/*`  | all existing non-opted-in extensions | current permissive behavior remains          |
+| Opt-in mode | `@alvasta-pro/plugin-sdk/*` | first-wave extensions only           | package-local `rootDir` + project references |
 
 ## Problem Frame
 
 The current repo exports a large public plugin SDK surface, but it is not a real
 workspace package. Instead:
 
-- root `tsconfig.json` maps `openclaw/plugin-sdk/*` directly to
+- root `tsconfig.json` maps `alvasta-pro/plugin-sdk/*` directly to
   `src/plugin-sdk/*.ts`
 - extensions that were not opted into the previous experiment still share that
   global source-alias behavior
@@ -41,7 +41,7 @@ does not enforce it cleanly for most extensions.
 You want an incremental path that:
 
 - makes `plugin-sdk` real
-- moves the SDK toward a workspace package named `@openclaw/plugin-sdk`
+- moves the SDK toward a workspace package named `@alvasta-pro/plugin-sdk`
 - changes only about 10 extensions in the first PR
 - leaves the rest of the extension tree on the old scheme until later cleanup
 - avoids the `tsconfig.plugin-sdk.dts.json` + postinstall-generated declaration
@@ -50,9 +50,9 @@ You want an incremental path that:
 ## Requirements Trace
 
 - R1. Create a real workspace package for the plugin SDK under `packages/`.
-- R2. Name the new package `@openclaw/plugin-sdk`.
+- R2. Name the new package `@alvasta-pro/plugin-sdk`.
 - R3. Give the new SDK package its own `package.json` and `tsconfig.json`.
-- R4. Keep legacy `openclaw/plugin-sdk/*` imports working for non-opted-in
+- R4. Keep legacy `alvasta-pro/plugin-sdk/*` imports working for non-opted-in
   extensions during the migration window.
 - R5. Opt in only a small first wave of extensions in the first PR.
 - R6. The first-wave extensions must fail closed for relative imports that leave
@@ -91,8 +91,8 @@ You want an incremental path that:
 - `src/plugin-sdk/entrypoints.ts` and `scripts/lib/plugin-sdk-entrypoints.json`
   already act as the canonical entrypoint inventory for the SDK surface.
 - Root `tsconfig.json` currently maps:
-  - `openclaw/plugin-sdk` -> `src/plugin-sdk/index.ts`
-  - `openclaw/plugin-sdk/*` -> `src/plugin-sdk/*.ts`
+  - `alvasta-pro/plugin-sdk` -> `src/plugin-sdk/index.ts`
+  - `alvasta-pro/plugin-sdk/*` -> `src/plugin-sdk/*.ts`
 - The previous boundary experiment showed that package-local `rootDir` works for
   illegal relative imports only after allowed SDK imports stop resolving to raw
   source outside the extension package.
@@ -116,7 +116,7 @@ to drag in complex channel-runtime edge cases:
 ### First-Wave SDK Surface Inventory
 
 The first-wave extensions currently import a manageable subset of SDK subpaths.
-The initial `@openclaw/plugin-sdk` package only needs to cover these:
+The initial `@alvasta-pro/plugin-sdk` package only needs to cover these:
 
 - `agent-runtime`
 - `cli-runtime`
@@ -161,8 +161,8 @@ The initial `@openclaw/plugin-sdk` package only needs to cover these:
 
 ## Key Technical Decisions
 
-- Introduce `@openclaw/plugin-sdk` as a new workspace package while keeping the
-  legacy root `openclaw/plugin-sdk/*` surface alive during migration.
+- Introduce `@alvasta-pro/plugin-sdk` as a new workspace package while keeping the
+  legacy root `alvasta-pro/plugin-sdk/*` surface alive during migration.
   Rationale: this lets a first-wave extension set move onto real package
   resolution without forcing every extension and every root build path to change
   at once.
@@ -179,7 +179,7 @@ The initial `@openclaw/plugin-sdk` package only needs to cover these:
   Rationale: this gives `tsc` a real package graph while discouraging editor and
   compiler fallback to raw source traversal.
 
-- Keep `@openclaw/plugin-sdk` private in the first wave.
+- Keep `@alvasta-pro/plugin-sdk` private in the first wave.
   Rationale: the immediate goal is internal boundary enforcement and migration
   safety, not publishing a second external SDK contract before the surface is
   stable.
@@ -214,10 +214,10 @@ The initial `@openclaw/plugin-sdk` package only needs to cover these:
 
 - Whether the first-wave package can point directly at package-local `src/*.ts`
   via project references alone, or whether a small declaration-emission step is
-  still required for the `@openclaw/plugin-sdk` package.
+  still required for the `@alvasta-pro/plugin-sdk` package.
   This is an implementation-owned TS graph validation question.
 
-- Whether the root `openclaw` package should proxy first-wave SDK subpaths to
+- Whether the root `alvasta-pro` package should proxy first-wave SDK subpaths to
   `packages/plugin-sdk` outputs immediately or continue using generated
   compatibility shims under `src/plugin-sdk`.
   This is a compatibility and build-shape detail that depends on the minimal
@@ -230,7 +230,7 @@ The initial `@openclaw/plugin-sdk` package only needs to cover these:
 ```mermaid
 flowchart TB
   subgraph Legacy["Legacy extensions (unchanged)"]
-    L1["extensions/*\nopenclaw/plugin-sdk/*"]
+    L1["extensions/*\nalvasta-pro/plugin-sdk/*"]
     L2["root tsconfig paths"]
     L1 --> L2
     L2 --> L3["src/plugin-sdk/*"]
@@ -240,7 +240,7 @@ flowchart TB
     O1["10 opted-in extensions"]
     O2["extensions/tsconfig.package-boundary.base.json"]
     O3["rootDir = '.'\nproject reference"]
-    O4["@openclaw/plugin-sdk"]
+    O4["@alvasta-pro/plugin-sdk"]
     O1 --> O2
     O2 --> O3
     O3 --> O4
@@ -259,7 +259,7 @@ flowchart TB
 
 ## Implementation Units
 
-- [ ] **Unit 1: Introduce the real `@openclaw/plugin-sdk` workspace package**
+- [ ] **Unit 1: Introduce the real `@alvasta-pro/plugin-sdk` workspace package**
 
 **Goal:** Create a real workspace package for the SDK that can own the
 first-wave subpath surface without forcing a repo-wide migration.
@@ -282,7 +282,7 @@ first-wave subpath surface without forcing a repo-wide migration.
 
 **Approach:**
 
-- Add a new workspace package named `@openclaw/plugin-sdk`.
+- Add a new workspace package named `@alvasta-pro/plugin-sdk`.
 - Start with the first-wave SDK subpaths only, not the entire 315-file tree.
 - If directly moving a first-wave entrypoint would create an oversized diff, the
   first PR may introduce that subpath in `packages/plugin-sdk/src` as a thin
@@ -310,7 +310,7 @@ first-wave subpath surface without forcing a repo-wide migration.
 
 **Verification:**
 
-- The repo contains a valid `@openclaw/plugin-sdk` workspace package with a
+- The repo contains a valid `@alvasta-pro/plugin-sdk` workspace package with a
   stable first-wave export map and no legacy export regression in root
   `package.json`.
 
@@ -374,7 +374,7 @@ opted-in extension before applying the pattern to all 10.
 - There is a dedicated typecheck graph for the 10 opted-in extensions, and bad
   relative imports from one of them fail through normal `tsc`.
 
-- [ ] **Unit 3: Migrate the first-wave extensions onto `@openclaw/plugin-sdk`**
+- [ ] **Unit 3: Migrate the first-wave extensions onto `@alvasta-pro/plugin-sdk`**
 
 **Goal:** Change the first-wave extensions to consume the real SDK package
 through dependency metadata, project references, and package-name imports.
@@ -396,14 +396,14 @@ through dependency metadata, project references, and package-name imports.
 - Modify: `extensions/together/package.json`
 - Modify: `extensions/xai/package.json`
 - Modify: production and test imports under each of the 10 extension roots that
-  currently reference `openclaw/plugin-sdk/*`
+  currently reference `alvasta-pro/plugin-sdk/*`
 
 **Approach:**
 
-- Add `@openclaw/plugin-sdk: workspace:*` to the first-wave extension
+- Add `@alvasta-pro/plugin-sdk: workspace:*` to the first-wave extension
   `devDependencies`.
-- Replace `openclaw/plugin-sdk/*` imports in those packages with
-  `@openclaw/plugin-sdk/*`.
+- Replace `alvasta-pro/plugin-sdk/*` imports in those packages with
+  `@alvasta-pro/plugin-sdk/*`.
 - Keep local extension-internal imports on local barrels such as `./api.ts` and
   `./runtime-api.ts`.
 - Do not change non-opted-in extensions in this PR.
@@ -411,7 +411,7 @@ through dependency metadata, project references, and package-name imports.
 **Patterns to follow:**
 
 - Existing extension-local import barrels (`api.ts`, `runtime-api.ts`)
-- Package dependency shape used by other `@openclaw/*` workspace packages
+- Package dependency shape used by other `@alvasta-pro/*` workspace packages
 
 **Test scenarios:**
 
@@ -419,12 +419,12 @@ through dependency metadata, project references, and package-name imports.
   plugin tests after the import rewrite.
 - Edge case: test-only SDK imports in the opted-in extension set still resolve
   correctly through the new package.
-- Integration: migrated extensions do not require root `openclaw/plugin-sdk/*`
+- Integration: migrated extensions do not require root `alvasta-pro/plugin-sdk/*`
   aliases for typechecking.
 
 **Verification:**
 
-- The first-wave extensions build and test against `@openclaw/plugin-sdk`
+- The first-wave extensions build and test against `@alvasta-pro/plugin-sdk`
   without needing the legacy root SDK alias path.
 
 - [ ] **Unit 4: Preserve legacy compatibility while the migration is partial**
@@ -446,7 +446,7 @@ and new-package forms during migration.
 
 **Approach:**
 
-- Keep root `openclaw/plugin-sdk/*` as the compatibility surface for legacy
+- Keep root `alvasta-pro/plugin-sdk/*` as the compatibility surface for legacy
   extensions and for external consumers that are not moving yet.
 - Use either generated shims or root-export proxy wiring for the first-wave
   subpaths that have moved into `packages/plugin-sdk`.
@@ -527,7 +527,7 @@ first wave without pretending the entire extension tree is migrated.
 - **State lifecycle risks:** dual-surface migration introduces drift risk between
   root compatibility exports and the new workspace package.
 - **API surface parity:** first-wave subpaths must remain semantically identical
-  through both `openclaw/plugin-sdk/*` and `@openclaw/plugin-sdk/*` during the
+  through both `alvasta-pro/plugin-sdk/*` and `@alvasta-pro/plugin-sdk/*` during the
   transition.
 - **Integration coverage:** unit tests are not enough; scoped package-graph
   typechecks are required to prove the boundary.
@@ -547,7 +547,7 @@ first wave without pretending the entire extension tree is migrated.
 
 ### Phase 1
 
-- Introduce `@openclaw/plugin-sdk`
+- Introduce `@alvasta-pro/plugin-sdk`
 - Define the first-wave subpath surface
 - Prove one opted-in extension can fail closed through `rootDir`
 

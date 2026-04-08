@@ -8,29 +8,29 @@ title: "Hooks"
 
 # Hooks
 
-Hooks are small scripts that run when something happens inside the Gateway. They are automatically discovered from directories and can be inspected with `openclaw hooks`.
+Hooks are small scripts that run when something happens inside the Gateway. They are automatically discovered from directories and can be inspected with `alvasta-pro hooks`.
 
-There are two kinds of hooks in OpenClaw:
+There are two kinds of hooks in Alvasta Pro:
 
 - **Internal hooks** (this page): run inside the Gateway when agent events fire, like `/new`, `/reset`, `/stop`, or lifecycle events.
-- **Webhooks**: external HTTP endpoints that let other systems trigger work in OpenClaw. See [Webhooks](/automation/cron-jobs#webhooks).
+- **Webhooks**: external HTTP endpoints that let other systems trigger work in Alvasta Pro. See [Webhooks](/automation/cron-jobs#webhooks).
 
-Hooks can also be bundled inside plugins. `openclaw hooks list` shows both standalone hooks and plugin-managed hooks.
+Hooks can also be bundled inside plugins. `alvasta-pro hooks list` shows both standalone hooks and plugin-managed hooks.
 
 ## Quick start
 
 ```bash
 # List available hooks
-openclaw hooks list
+alvasta-pro hooks list
 
 # Enable a hook
-openclaw hooks enable session-memory
+alvasta-pro hooks enable session-memory
 
 # Check hook status
-openclaw hooks check
+alvasta-pro hooks check
 
 # Get detailed information
-openclaw hooks info session-memory
+alvasta-pro hooks info session-memory
 ```
 
 ## Event types
@@ -70,7 +70,7 @@ my-hook/
 name: my-hook
 description: "Short description of what this hook does"
 metadata:
-  { "openclaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
+  { "alvasta-pro": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
 
 # My Hook
@@ -78,7 +78,7 @@ metadata:
 Detailed documentation goes here.
 ```
 
-**Metadata fields** (`metadata.openclaw`):
+**Metadata fields** (`metadata.alvasta-pro`):
 
 | Field      | Description                                          |
 | ---------- | ---------------------------------------------------- |
@@ -132,19 +132,19 @@ Each event includes: `type`, `action`, `sessionKey`, `timestamp`, `messages` (pu
 
 Hooks are discovered from these directories, in order of increasing override precedence:
 
-1. **Bundled hooks**: shipped with OpenClaw
+1. **Bundled hooks**: shipped with Alvasta Pro
 2. **Plugin hooks**: hooks bundled inside installed plugins
-3. **Managed hooks**: `~/.openclaw/hooks/` (user-installed, shared across workspaces). Extra directories from `hooks.internal.load.extraDirs` share this precedence.
+3. **Managed hooks**: `~/.alvasta-pro/hooks/` (user-installed, shared across workspaces). Extra directories from `hooks.internal.load.extraDirs` share this precedence.
 4. **Workspace hooks**: `<workspace>/hooks/` (per-agent, disabled by default until explicitly enabled)
 
 Workspace hooks can add new hook names but cannot override bundled, managed, or plugin-provided hooks with the same name.
 
 ### Hook packs
 
-Hook packs are npm packages that export hooks via `openclaw.hooks` in `package.json`. Install with:
+Hook packs are npm packages that export hooks via `alvasta-pro.hooks` in `package.json`. Install with:
 
 ```bash
-openclaw plugins install <path-or-spec>
+alvasta-pro plugins install <path-or-spec>
 ```
 
 Npm specs are registry-only (package name + optional exact version or dist-tag). Git/URL/file specs and semver ranges are rejected.
@@ -155,13 +155,13 @@ Npm specs are registry-only (package name + optional exact version or dist-tag).
 | --------------------- | ------------------------------ | ----------------------------------------------------- |
 | session-memory        | `command:new`, `command:reset` | Saves session context to `<workspace>/memory/`        |
 | bootstrap-extra-files | `agent:bootstrap`              | Injects additional bootstrap files from glob patterns |
-| command-logger        | `command`                      | Logs all commands to `~/.openclaw/logs/commands.log`  |
+| command-logger        | `command`                      | Logs all commands to `~/.alvasta-pro/logs/commands.log`  |
 | boot-md               | `gateway:startup`              | Runs `BOOT.md` when the gateway starts                |
 
 Enable any bundled hook:
 
 ```bash
-openclaw hooks enable <hook-name>
+alvasta-pro hooks enable <hook-name>
 ```
 
 ### session-memory details
@@ -248,17 +248,17 @@ The legacy `hooks.internal.handlers` array config format is still supported for 
 
 ```bash
 # List all hooks (add --eligible, --verbose, or --json)
-openclaw hooks list
+alvasta-pro hooks list
 
 # Show detailed info about a hook
-openclaw hooks info <hook-name>
+alvasta-pro hooks info <hook-name>
 
 # Show eligibility summary
-openclaw hooks check
+alvasta-pro hooks check
 
 # Enable/disable
-openclaw hooks enable <hook-name>
-openclaw hooks disable <hook-name>
+alvasta-pro hooks enable <hook-name>
+alvasta-pro hooks disable <hook-name>
 ```
 
 ## Best practices
@@ -274,24 +274,24 @@ openclaw hooks disable <hook-name>
 
 ```bash
 # Verify directory structure
-ls -la ~/.openclaw/hooks/my-hook/
+ls -la ~/.alvasta-pro/hooks/my-hook/
 # Should show: HOOK.md, handler.ts
 
 # List all discovered hooks
-openclaw hooks list
+alvasta-pro hooks list
 ```
 
 ### Hook not eligible
 
 ```bash
-openclaw hooks info my-hook
+alvasta-pro hooks info my-hook
 ```
 
 Check for missing binaries (PATH), environment variables, config values, or OS compatibility.
 
 ### Hook not executing
 
-1. Verify the hook is enabled: `openclaw hooks list`
+1. Verify the hook is enabled: `alvasta-pro hooks list`
 2. Restart your gateway process so hooks reload.
 3. Check gateway logs: `./scripts/clawlog.sh | grep hook`
 

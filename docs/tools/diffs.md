@@ -197,7 +197,7 @@ Mode behavior summary:
 
 ## Plugin defaults
 
-Set plugin-wide defaults in `~/.openclaw/openclaw.json`:
+Set plugin-wide defaults in `~/.alvasta-pro/alvasta-pro.json`:
 
 ```json5
 {
@@ -263,7 +263,7 @@ Example:
       diffs: {
         enabled: true,
         config: {
-          viewerBaseUrl: "https://gateway.example.com/openclaw",
+          viewerBaseUrl: "https://gateway.example.com/alvasta-pro",
         },
       },
     },
@@ -298,7 +298,7 @@ Example:
 
 ## Artifact lifecycle and storage
 
-- Artifacts are stored under the temp subfolder: `$TMPDIR/openclaw-diffs`.
+- Artifacts are stored under the temp subfolder: `$TMPDIR/alvasta-pro-diffs`.
 - Viewer artifact metadata contains:
   - random artifact ID (20 hex chars)
   - random token (48 hex chars)
@@ -362,7 +362,7 @@ File rendering hardening:
 
 Resolution order:
 
-1. `browser.executablePath` in OpenClaw config.
+1. `browser.executablePath` in Alvasta Pro config.
 2. Environment variables:
    - `OPENCLAW_BROWSER_EXECUTABLE_PATH`
    - `BROWSER_EXECUTABLE_PATH`

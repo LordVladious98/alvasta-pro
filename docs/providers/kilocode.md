@@ -1,9 +1,9 @@
 ---
 title: "Kilo Gateway"
-summary: "Use Kilo Gateway's unified API to access many models in OpenClaw"
+summary: "Use Kilo Gateway's unified API to access many models in Alvasta Pro"
 read_when:
   - You want a single API key for many LLMs
-  - You want to run models via Kilo Gateway in OpenClaw
+  - You want to run models via Kilo Gateway in Alvasta Pro
 ---
 
 # Kilo Gateway
@@ -20,7 +20,7 @@ endpoint and API key. It is OpenAI-compatible, so most OpenAI SDKs work by switc
 ## CLI setup
 
 ```bash
-openclaw onboard --auth-choice kilocode-api-key
+alvasta-pro onboard --auth-choice kilocode-api-key
 ```
 
 Or set the environment variable:
@@ -47,12 +47,12 @@ export KILOCODE_API_KEY="<your-kilocode-api-key>" # pragma: allowlist secret
 The default model is `kilocode/kilo/auto`, a provider-owned smart-routing
 model managed by Kilo Gateway.
 
-OpenClaw treats `kilocode/kilo/auto` as the stable default ref, but does not
+Alvasta Pro treats `kilocode/kilo/auto` as the stable default ref, but does not
 publish a source-backed task-to-upstream-model mapping for that route.
 
 ## Available models
 
-OpenClaw dynamically discovers available models from the Kilo Gateway at startup. Use
+Alvasta Pro dynamically discovers available models from the Kilo Gateway at startup. Use
 `/models kilocode` to see the full list of models available with your account.
 
 Any model available on the gateway can be used with the `kilocode/` prefix:
@@ -73,13 +73,13 @@ kilocode/google/gemini-3-pro-preview
 - Bundled fallback catalog always includes `kilocode/kilo/auto` (`Kilo Auto`) with
   `input: ["text", "image"]`, `reasoning: true`, `contextWindow: 1000000`,
   and `maxTokens: 128000`
-- At startup, OpenClaw tries `GET https://api.kilo.ai/api/gateway/models` and
+- At startup, Alvasta Pro tries `GET https://api.kilo.ai/api/gateway/models` and
   merges discovered models ahead of the static fallback catalog
 - Exact upstream routing behind `kilocode/kilo/auto` is owned by Kilo Gateway,
-  not hard-coded in OpenClaw
+  not hard-coded in Alvasta Pro
 - Kilo Gateway is documented in source as OpenRouter-compatible, so it stays on
   the proxy-style OpenAI-compatible path rather than native OpenAI request shaping
-- Gemini-backed Kilo refs stay on the proxy-Gemini path, so OpenClaw keeps
+- Gemini-backed Kilo refs stay on the proxy-Gemini path, so Alvasta Pro keeps
   Gemini thought-signature sanitation there without enabling native Gemini
   replay validation or bootstrap rewrites.
 - Kilo's shared stream wrapper adds the provider app header and normalizes

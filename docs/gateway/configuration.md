@@ -1,7 +1,7 @@
 ---
 summary: "Configuration overview: common tasks, quick setup, and links to the full reference"
 read_when:
-  - Setting up OpenClaw for the first time
+  - Setting up Alvasta Pro for the first time
   - Looking for common configuration patterns
   - Navigating to specific config sections
 title: "Configuration"
@@ -9,9 +9,9 @@ title: "Configuration"
 
 # Configuration
 
-OpenClaw reads an optional <Tooltip tip="JSON5 supports comments and trailing commas">**JSON5**</Tooltip> config from `~/.openclaw/openclaw.json`.
+Alvasta Pro reads an optional <Tooltip tip="JSON5 supports comments and trailing commas">**JSON5**</Tooltip> config from `~/.alvasta-pro/alvasta-pro.json`.
 
-If the file is missing, OpenClaw uses safe defaults. Common reasons to add a config:
+If the file is missing, Alvasta Pro uses safe defaults. Common reasons to add a config:
 
 - Connect channels and control who can message the bot
 - Set models, tools, sandboxing, or automation (cron, hooks)
@@ -20,15 +20,15 @@ If the file is missing, OpenClaw uses safe defaults. Common reasons to add a con
 See the [full reference](/gateway/configuration-reference) for every available field.
 
 <Tip>
-**New to configuration?** Start with `openclaw onboard` for interactive setup, or check out the [Configuration Examples](/gateway/configuration-examples) guide for complete copy-paste configs.
+**New to configuration?** Start with `alvasta-pro onboard` for interactive setup, or check out the [Configuration Examples](/gateway/configuration-examples) guide for complete copy-paste configs.
 </Tip>
 
 ## Minimal config
 
 ```json5
-// ~/.openclaw/openclaw.json
+// ~/.alvasta-pro/alvasta-pro.json
 {
-  agents: { defaults: { workspace: "~/.openclaw/workspace" } },
+  agents: { defaults: { workspace: "~/.alvasta-pro/workspace" } },
   channels: { whatsapp: { allowFrom: ["+15555550123"] } },
 }
 ```
@@ -38,15 +38,15 @@ See the [full reference](/gateway/configuration-reference) for every available f
 <Tabs>
   <Tab title="Interactive wizard">
     ```bash
-    openclaw onboard       # full onboarding flow
-    openclaw configure     # config wizard
+    alvasta-pro onboard       # full onboarding flow
+    alvasta-pro configure     # config wizard
     ```
   </Tab>
   <Tab title="CLI (one-liners)">
     ```bash
-    openclaw config get agents.defaults.workspace
-    openclaw config set agents.defaults.heartbeat.every "2h"
-    openclaw config unset plugins.entries.brave.config.webSearch.apiKey
+    alvasta-pro config get agents.defaults.workspace
+    alvasta-pro config set agents.defaults.heartbeat.every "2h"
+    alvasta-pro config unset plugins.entries.brave.config.webSearch.apiKey
     ```
   </Tab>
   <Tab title="Control UI">
@@ -58,19 +58,19 @@ See the [full reference](/gateway/configuration-reference) for every available f
     fetch one path-scoped schema node plus immediate child summaries.
   </Tab>
   <Tab title="Direct edit">
-    Edit `~/.openclaw/openclaw.json` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
+    Edit `~/.alvasta-pro/alvasta-pro.json` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
   </Tab>
 </Tabs>
 
 ## Strict validation
 
 <Warning>
-OpenClaw only accepts configurations that fully match the schema. Unknown keys, malformed types, or invalid values cause the Gateway to **refuse to start**. The only root-level exception is `$schema` (string), so editors can attach JSON Schema metadata.
+Alvasta Pro only accepts configurations that fully match the schema. Unknown keys, malformed types, or invalid values cause the Gateway to **refuse to start**. The only root-level exception is `$schema` (string), so editors can attach JSON Schema metadata.
 </Warning>
 
 Schema tooling notes:
 
-- `openclaw config schema` prints the same JSON Schema family used by Control UI
+- `alvasta-pro config schema` prints the same JSON Schema family used by Control UI
   and config validation.
 - Field `title` and `description` values are carried into the schema output for
   editor and form tooling.
@@ -88,9 +88,9 @@ Schema tooling notes:
 When validation fails:
 
 - The Gateway does not boot
-- Only diagnostic commands work (`openclaw doctor`, `openclaw logs`, `openclaw health`, `openclaw status`)
-- Run `openclaw doctor` to see exact issues
-- Run `openclaw doctor --fix` (or `--yes`) to apply repairs
+- Only diagnostic commands work (`alvasta-pro doctor`, `alvasta-pro logs`, `alvasta-pro health`, `alvasta-pro status`)
+- Run `alvasta-pro doctor` to see exact issues
+- Run `alvasta-pro doctor --fix` (or `--yes`) to apply repairs
 
 ## Common tasks
 
@@ -178,7 +178,7 @@ When validation fails:
           {
             id: "main",
             groupChat: {
-              mentionPatterns: ["@openclaw", "openclaw"],
+              mentionPatterns: ["@alvasta-pro", "alvasta-pro"],
             },
           },
         ],
@@ -305,7 +305,7 @@ When validation fails:
   </Accordion>
 
   <Accordion title="Enable relay-backed push for official iOS builds">
-    Relay-backed push is configured in `openclaw.json`.
+    Relay-backed push is configured in `alvasta-pro.json`.
 
     Set this in gateway config:
 
@@ -328,7 +328,7 @@ When validation fails:
     CLI equivalent:
 
     ```bash
-    openclaw config set gateway.push.apns.relay.baseUrl https://relay.example.com
+    alvasta-pro config set gateway.push.apns.relay.baseUrl https://relay.example.com
     ```
 
     What this does:
@@ -430,7 +430,7 @@ When validation fails:
     Security note:
     - Treat all hook/webhook payload content as untrusted input.
     - Use a dedicated `hooks.token`; do not reuse the shared Gateway token.
-    - Hook auth is header-only (`Authorization: Bearer ...` or `x-openclaw-token`); query-string tokens are rejected.
+    - Hook auth is header-only (`Authorization: Bearer ...` or `x-alvasta-pro-token`); query-string tokens are rejected.
     - `hooks.path` cannot be `/`; keep webhook ingress on a dedicated subpath such as `/hooks`.
     - Keep unsafe-content bypass flags disabled (`hooks.gmail.allowUnsafeExternalContent`, `hooks.mappings[].allowUnsafeExternalContent`) unless doing tightly scoped debugging.
     - If you enable `hooks.allowRequestSessionKey`, also set `hooks.allowedSessionKeyPrefixes` to bound caller-selected session keys.
@@ -447,8 +447,8 @@ When validation fails:
     {
       agents: {
         list: [
-          { id: "home", default: true, workspace: "~/.openclaw/workspace-home" },
-          { id: "work", workspace: "~/.openclaw/workspace-work" },
+          { id: "home", default: true, workspace: "~/.alvasta-pro/workspace-home" },
+          { id: "work", workspace: "~/.alvasta-pro/workspace-work" },
         ],
       },
       bindings: [
@@ -466,7 +466,7 @@ When validation fails:
     Use `$include` to organize large configs:
 
     ```json5
-    // ~/.openclaw/openclaw.json
+    // ~/.alvasta-pro/alvasta-pro.json
     {
       gateway: { port: 18789 },
       agents: { $include: "./agents.json5" },
@@ -488,7 +488,7 @@ When validation fails:
 
 ## Config hot reload
 
-The Gateway watches `~/.openclaw/openclaw.json` and applies changes automatically — no manual restart needed for most settings.
+The Gateway watches `~/.alvasta-pro/alvasta-pro.json` and applies changes automatically — no manual restart needed for most settings.
 
 ### Reload modes
 
@@ -549,7 +549,7 @@ then `config.patch`.
     Validates + writes the full config and restarts the Gateway in one step.
 
     <Warning>
-    `config.apply` replaces the **entire config**. Use `config.patch` for partial updates, or `openclaw config set` for single keys.
+    `config.apply` replaces the **entire config**. Use `config.patch` for partial updates, or `alvasta-pro config set` for single keys.
     </Warning>
 
     Params:
@@ -563,9 +563,9 @@ then `config.patch`.
     Restart requests are coalesced while one is already pending/in-flight, and a 30-second cooldown applies between restart cycles.
 
     ```bash
-    openclaw gateway call config.get --params '{}'  # capture payload.hash
-    openclaw gateway call config.apply --params '{
-      "raw": "{ agents: { defaults: { workspace: \"~/.openclaw/workspace\" } } }",
+    alvasta-pro gateway call config.get --params '{}'  # capture payload.hash
+    alvasta-pro gateway call config.apply --params '{
+      "raw": "{ agents: { defaults: { workspace: \"~/.alvasta-pro/workspace\" } } }",
       "baseHash": "<hash>",
       "sessionKey": "agent:main:whatsapp:direct:+15555550123"
     }'
@@ -589,7 +589,7 @@ then `config.patch`.
     Restart behavior matches `config.apply`: coalesced pending restarts plus a 30-second cooldown between restart cycles.
 
     ```bash
-    openclaw gateway call config.patch --params '{
+    alvasta-pro gateway call config.patch --params '{
       "raw": "{ channels: { telegram: { groups: { \"*\": { requireMention: false } } } } }",
       "baseHash": "<hash>"
     }'
@@ -600,10 +600,10 @@ then `config.patch`.
 
 ## Environment variables
 
-OpenClaw reads env vars from the parent process plus:
+Alvasta Pro reads env vars from the parent process plus:
 
 - `.env` from the current working directory (if present)
-- `~/.openclaw/.env` (global fallback)
+- `~/.alvasta-pro/.env` (global fallback)
 
 Neither file overrides existing env vars. You can also set inline env vars in config:
 
@@ -617,7 +617,7 @@ Neither file overrides existing env vars. You can also set inline env vars in co
 ```
 
 <Accordion title="Shell env import (optional)">
-  If enabled and expected keys aren't set, OpenClaw runs your login shell and imports only the missing keys:
+  If enabled and expected keys aren't set, Alvasta Pro runs your login shell and imports only the missing keys:
 
 ```json5
 {

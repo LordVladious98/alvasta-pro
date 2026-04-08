@@ -1,28 +1,28 @@
 ---
 title: "Building Channel Plugins"
 sidebarTitle: "Channel Plugins"
-summary: "Step-by-step guide to building a messaging channel plugin for OpenClaw"
+summary: "Step-by-step guide to building a messaging channel plugin for Alvasta Pro"
 read_when:
   - You are building a new messaging channel plugin
-  - You want to connect OpenClaw to a messaging platform
+  - You want to connect Alvasta Pro to a messaging platform
   - You need to understand the ChannelPlugin adapter surface
 ---
 
 # Building Channel Plugins
 
-This guide walks through building a channel plugin that connects OpenClaw to a
+This guide walks through building a channel plugin that connects Alvasta Pro to a
 messaging platform. By the end you will have a working channel with DM security,
 pairing, reply threading, and outbound messaging.
 
 <Info>
-  If you have not built any OpenClaw plugin before, read
+  If you have not built any Alvasta Pro plugin before, read
   [Getting Started](/plugins/building-plugins) first for the basic package
   structure and manifest setup.
 </Info>
 
 ## How channel plugins work
 
-Channel plugins do not need their own send/edit/react tools. OpenClaw keeps one
+Channel plugins do not need their own send/edit/react tools. Alvasta Pro keeps one
 shared `message` tool in core. Your plugin owns:
 
 - **Config** — account resolution and setup wizard
@@ -66,8 +66,8 @@ Most channel plugins do not need approval-specific code.
 - Use `approvalCapability.delivery` only for native approval routing or fallback suppression.
 - Use `approvalCapability.render` only when a channel truly needs custom approval payloads instead of the shared renderer.
 - Use `approvalCapability.describeExecApprovalSetup` when the channel wants the disabled-path reply to explain the exact config knobs needed to enable native exec approvals. The hook receives `{ channel, channelLabel, accountId }`; named-account channels should render account-scoped paths such as `channels.<channel>.accounts.<id>.execApprovals.*` instead of top-level defaults.
-- If a channel can infer stable owner-like DM identities from existing config, use `createResolvedApproverActionAuthAdapter` from `openclaw/plugin-sdk/approval-runtime` to restrict same-chat `/approve` without adding approval-specific core logic.
-- If a channel needs native approval delivery, keep channel code focused on target normalization and transport hooks. Use `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver`, `createApproverRestrictedNativeApprovalCapability`, and `createChannelNativeApprovalRuntime` from `openclaw/plugin-sdk/approval-runtime` so core owns request filtering, routing, dedupe, expiry, and gateway subscription.
+- If a channel can infer stable owner-like DM identities from existing config, use `createResolvedApproverActionAuthAdapter` from `alvasta-pro/plugin-sdk/approval-runtime` to restrict same-chat `/approve` without adding approval-specific core logic.
+- If a channel needs native approval delivery, keep channel code focused on target normalization and transport hooks. Use `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver`, `createApproverRestrictedNativeApprovalCapability`, and `createChannelNativeApprovalRuntime` from `alvasta-pro/plugin-sdk/approval-runtime` so core owns request filtering, routing, dedupe, expiry, and gateway subscription.
 - Native approval channels must route both `accountId` and `approvalKind` through those helpers. `accountId` keeps multi-account approval policy scoped to the right bot account, and `approvalKind` keeps exec vs plugin approval behavior available to the channel without hardcoded branches in core.
 - Preserve the delivered approval id kind end-to-end. Native clients should not
   guess or rewrite exec vs plugin approval routing from channel-local state.
@@ -81,31 +81,31 @@ Most channel plugins do not need approval-specific code.
 For hot channel entrypoints, prefer the narrower runtime subpaths when you only
 need one part of that family:
 
-- `openclaw/plugin-sdk/approval-auth-runtime`
-- `openclaw/plugin-sdk/approval-client-runtime`
-- `openclaw/plugin-sdk/approval-delivery-runtime`
-- `openclaw/plugin-sdk/approval-native-runtime`
-- `openclaw/plugin-sdk/approval-reply-runtime`
+- `alvasta-pro/plugin-sdk/approval-auth-runtime`
+- `alvasta-pro/plugin-sdk/approval-client-runtime`
+- `alvasta-pro/plugin-sdk/approval-delivery-runtime`
+- `alvasta-pro/plugin-sdk/approval-native-runtime`
+- `alvasta-pro/plugin-sdk/approval-reply-runtime`
 
-Likewise, prefer `openclaw/plugin-sdk/setup-runtime`,
-`openclaw/plugin-sdk/setup-adapter-runtime`,
-`openclaw/plugin-sdk/reply-runtime`,
-`openclaw/plugin-sdk/reply-dispatch-runtime`,
-`openclaw/plugin-sdk/reply-reference`, and
-`openclaw/plugin-sdk/reply-chunking` when you do not need the broader umbrella
+Likewise, prefer `alvasta-pro/plugin-sdk/setup-runtime`,
+`alvasta-pro/plugin-sdk/setup-adapter-runtime`,
+`alvasta-pro/plugin-sdk/reply-runtime`,
+`alvasta-pro/plugin-sdk/reply-dispatch-runtime`,
+`alvasta-pro/plugin-sdk/reply-reference`, and
+`alvasta-pro/plugin-sdk/reply-chunking` when you do not need the broader umbrella
 surface.
 
 For setup specifically:
 
-- `openclaw/plugin-sdk/setup-runtime` covers the runtime-safe setup helpers:
+- `alvasta-pro/plugin-sdk/setup-runtime` covers the runtime-safe setup helpers:
   import-safe setup patch adapters (`createPatchedAccountSetupAdapter`,
   `createEnvPatchedAccountSetupAdapter`,
   `createSetupInputPresenceValidator`), lookup-note output,
   `promptResolvedAllowFrom`, `splitSetupEntries`, and the delegated
   setup-proxy builders
-- `openclaw/plugin-sdk/setup-adapter-runtime` is the narrow env-aware adapter
+- `alvasta-pro/plugin-sdk/setup-adapter-runtime` is the narrow env-aware adapter
   seam for `createEnvPatchedAccountSetupAdapter`
-- `openclaw/plugin-sdk/channel-setup` covers the optional-install setup
+- `alvasta-pro/plugin-sdk/channel-setup` covers the optional-install setup
   builders plus a few setup-safe primitives:
   `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`,
 
@@ -117,7 +117,7 @@ constants for operator-facing copy only.
 `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled`, and
 `splitSetupEntries`
 
-- use the broader `openclaw/plugin-sdk/setup` seam only when you also need the
+- use the broader `alvasta-pro/plugin-sdk/setup` seam only when you also need the
   heavier shared setup/config helpers such as
   `moveSingleAccountChannelSectionToDefaultAccount(...)`
 
@@ -130,23 +130,23 @@ copy.
 For other hot channel paths, prefer the narrow helpers over broader legacy
 surfaces:
 
-- `openclaw/plugin-sdk/account-core`,
-  `openclaw/plugin-sdk/account-id`,
-  `openclaw/plugin-sdk/account-resolution`, and
-  `openclaw/plugin-sdk/account-helpers` for multi-account config and
+- `alvasta-pro/plugin-sdk/account-core`,
+  `alvasta-pro/plugin-sdk/account-id`,
+  `alvasta-pro/plugin-sdk/account-resolution`, and
+  `alvasta-pro/plugin-sdk/account-helpers` for multi-account config and
   default-account fallback
-- `openclaw/plugin-sdk/inbound-envelope` and
-  `openclaw/plugin-sdk/inbound-reply-dispatch` for inbound route/envelope and
+- `alvasta-pro/plugin-sdk/inbound-envelope` and
+  `alvasta-pro/plugin-sdk/inbound-reply-dispatch` for inbound route/envelope and
   record-and-dispatch wiring
-- `openclaw/plugin-sdk/messaging-targets` for target parsing/matching
-- `openclaw/plugin-sdk/outbound-media` and
-  `openclaw/plugin-sdk/outbound-runtime` for media loading plus outbound
+- `alvasta-pro/plugin-sdk/messaging-targets` for target parsing/matching
+- `alvasta-pro/plugin-sdk/outbound-media` and
+  `alvasta-pro/plugin-sdk/outbound-runtime` for media loading plus outbound
   identity/send delegates
-- `openclaw/plugin-sdk/thread-bindings-runtime` for thread-binding lifecycle
+- `alvasta-pro/plugin-sdk/thread-bindings-runtime` for thread-binding lifecycle
   and adapter registration
-- `openclaw/plugin-sdk/agent-media-payload` only when a legacy agent/media
+- `alvasta-pro/plugin-sdk/agent-media-payload` only when a legacy agent/media
   payload field layout is still required
-- `openclaw/plugin-sdk/telegram-command-config` for Telegram custom-command
+- `alvasta-pro/plugin-sdk/telegram-command-config` for Telegram custom-command
   normalization, duplicate/conflict validation, and a fallback-stable command
   config contract
 
@@ -159,7 +159,7 @@ Keep inbound mention handling split in two layers:
 - plugin-owned evidence gathering
 - shared policy evaluation
 
-Use `openclaw/plugin-sdk/channel-inbound` for the shared layer.
+Use `alvasta-pro/plugin-sdk/channel-inbound` for the shared layer.
 
 Good fit for plugin-local logic:
 
@@ -188,7 +188,7 @@ import {
   implicitMentionKindWhen,
   matchesMentionWithExplicit,
   resolveInboundMentionDecision,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "alvasta-pro/plugin-sdk/channel-inbound";
 
 const mentionMatch = matchesMentionWithExplicit(text, {
   mentionRegexes,
@@ -230,7 +230,7 @@ bundled channel plugins that already depend on runtime injection:
 - `resolveInboundMentionDecision`
 
 The older `resolveMentionGating*` helpers remain on
-`openclaw/plugin-sdk/channel-inbound` as compatibility exports only. New code
+`alvasta-pro/plugin-sdk/channel-inbound` as compatibility exports only. New code
 should use `resolveInboundMentionDecision({ facts, policy })`.
 
 ## Walkthrough
@@ -240,27 +240,27 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
   <Step title="Package and manifest">
     Create the standard plugin files. The `channel` field in `package.json` is
     what makes this a channel plugin. For the full package-metadata surface,
-    see [Plugin Setup and Config](/plugins/sdk-setup#openclawchannel):
+    see [Plugin Setup and Config](/plugins/sdk-setup#alvasta-prochannel):
 
     <CodeGroup>
     ```json package.json
     {
-      "name": "@myorg/openclaw-acme-chat",
+      "name": "@myorg/alvasta-pro-acme-chat",
       "version": "1.0.0",
       "type": "module",
-      "openclaw": {
+      "alvasta-pro": {
         "extensions": ["./index.ts"],
         "setupEntry": "./setup-entry.ts",
         "channel": {
           "id": "acme-chat",
           "label": "Acme Chat",
-          "blurb": "Connect OpenClaw to Acme Chat."
+          "blurb": "Connect Alvasta Pro to Acme Chat."
         }
       }
     }
     ```
 
-    ```json openclaw.plugin.json
+    ```json alvasta-pro.plugin.json
     {
       "id": "acme-chat",
       "kind": "channel",
@@ -299,8 +299,8 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     import {
       createChatChannelPlugin,
       createChannelPluginBase,
-    } from "openclaw/plugin-sdk/channel-core";
-    import type { OpenClawConfig } from "openclaw/plugin-sdk/channel-core";
+    } from "alvasta-pro/plugin-sdk/channel-core";
+    import type { Alvasta ProConfig } from "alvasta-pro/plugin-sdk/channel-core";
     import { acmeChatApi } from "./client.js"; // your platform API client
 
     type ResolvedAccount = {
@@ -311,7 +311,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     };
 
     function resolveAccount(
-      cfg: OpenClawConfig,
+      cfg: Alvasta ProConfig,
       accountId?: string | null,
     ): ResolvedAccount {
       const section = (cfg.channels as Record<string, any>)?.["acme-chat"];
@@ -407,7 +407,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     Create `index.ts`:
 
     ```typescript index.ts
-    import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
+    import { defineChannelPluginEntry } from "alvasta-pro/plugin-sdk/channel-core";
     import { acmeChatPlugin } from "./src/channel.js";
 
     export default defineChannelPluginEntry({
@@ -439,7 +439,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     });
     ```
 
-    Put channel-owned CLI descriptors in `registerCliMetadata(...)` so OpenClaw
+    Put channel-owned CLI descriptors in `registerCliMetadata(...)` so Alvasta Pro
     can show them in root help without activating the full channel runtime,
     while normal full loads still pick up the same descriptors for real command
     registration. Keep `registerFull(...)` for runtime-only work.
@@ -457,13 +457,13 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     Create `setup-entry.ts` for lightweight loading during onboarding:
 
     ```typescript setup-entry.ts
-    import { defineSetupPluginEntry } from "openclaw/plugin-sdk/channel-core";
+    import { defineSetupPluginEntry } from "alvasta-pro/plugin-sdk/channel-core";
     import { acmeChatPlugin } from "./src/channel.js";
 
     export default defineSetupPluginEntry(acmeChatPlugin);
     ```
 
-    OpenClaw loads this instead of the full entry when the channel is disabled
+    Alvasta Pro loads this instead of the full entry when the channel is disabled
     or unconfigured. It avoids pulling in heavy runtime code during setup flows.
     See [Setup and Config](/plugins/sdk-setup#setup-entry) for details.
 
@@ -471,7 +471,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
 
   <Step title="Handle inbound messages">
     Your plugin needs to receive messages from the platform and forward them to
-    OpenClaw. The typical pattern is a webhook that verifies the request and
+    Alvasta Pro. The typical pattern is a webhook that verifies the request and
     dispatches it through your channel's inbound handler:
 
     ```typescript
@@ -482,7 +482,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
         handler: async (req, res) => {
           const event = parseWebhookPayload(req);
 
-          // Your inbound handler dispatches the message to OpenClaw.
+          // Your inbound handler dispatches the message to Alvasta Pro.
           // The exact wiring depends on your platform SDK —
           // see a real example in the bundled Microsoft Teams or Google Chat plugin package.
           await handleAcmeChatInbound(api, event);
@@ -552,8 +552,8 @@ Write colocated tests in `src/channel.test.ts`:
 
 ```
 <bundled-plugin-root>/acme-chat/
-├── package.json              # openclaw.channel metadata
-├── openclaw.plugin.json      # Manifest with config schema
+├── package.json              # alvasta-pro.channel metadata
+├── alvasta-pro.plugin.json      # Manifest with config schema
 ├── index.ts                  # defineChannelPluginEntry
 ├── setup-entry.ts            # defineSetupPluginEntry
 ├── api.ts                    # Public exports (optional)

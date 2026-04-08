@@ -1,19 +1,19 @@
 ---
-summary: "Use Amazon Bedrock Mantle (OpenAI-compatible) models with OpenClaw"
+summary: "Use Amazon Bedrock Mantle (OpenAI-compatible) models with Alvasta Pro"
 read_when:
-  - You want to use Bedrock Mantle hosted OSS models with OpenClaw
+  - You want to use Bedrock Mantle hosted OSS models with Alvasta Pro
   - You need the Mantle OpenAI-compatible endpoint for GPT-OSS, Qwen, Kimi, or GLM
 title: "Amazon Bedrock Mantle"
 ---
 
 # Amazon Bedrock Mantle
 
-OpenClaw includes a bundled **Amazon Bedrock Mantle** provider that connects to
+Alvasta Pro includes a bundled **Amazon Bedrock Mantle** provider that connects to
 the Mantle OpenAI-compatible endpoint. Mantle hosts open-source and
 third-party models (GPT-OSS, Qwen, Kimi, GLM, and similar) through a standard
 `/v1/chat/completions` surface backed by Bedrock infrastructure.
 
-## What OpenClaw supports
+## What Alvasta Pro supports
 
 - Provider: `amazon-bedrock-mantle`
 - API: `openai-completions` (OpenAI-compatible)
@@ -22,8 +22,8 @@ third-party models (GPT-OSS, Qwen, Kimi, GLM, and similar) through a standard
 
 ## Automatic model discovery
 
-When `AWS_BEARER_TOKEN_BEDROCK` is set, OpenClaw uses it directly. Otherwise,
-OpenClaw attempts to generate a Mantle bearer token from the AWS default
+When `AWS_BEARER_TOKEN_BEDROCK` is set, Alvasta Pro uses it directly. Otherwise,
+Alvasta Pro attempts to generate a Mantle bearer token from the AWS default
 credential chain, including shared credentials/config profiles, SSO, web
 identity, and instance or task roles. It then discovers available Mantle
 models by querying the region's `/v1/models` endpoint. Discovery results are
@@ -56,7 +56,7 @@ export AWS_REGION="us-west-2"
 2. Verify models are discovered:
 
 ```bash
-openclaw models list
+alvasta-pro models list
 ```
 
 Discovered models appear under the `amazon-bedrock-mantle` provider. No
@@ -94,7 +94,7 @@ If you prefer explicit config instead of auto-discovery:
 
 ## Notes
 
-- OpenClaw can mint the Mantle bearer token for you from AWS SDK-compatible
+- Alvasta Pro can mint the Mantle bearer token for you from AWS SDK-compatible
   IAM credentials when `AWS_BEARER_TOKEN_BEDROCK` is not set.
 - The bearer token is the same `AWS_BEARER_TOKEN_BEDROCK` used by the standard
   [Amazon Bedrock](/providers/bedrock) provider.

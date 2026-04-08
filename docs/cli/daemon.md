@@ -1,26 +1,26 @@
 ---
-summary: "CLI reference for `openclaw daemon` (legacy alias for gateway service management)"
+summary: "CLI reference for `alvasta-pro daemon` (legacy alias for gateway service management)"
 read_when:
-  - You still use `openclaw daemon ...` in scripts
+  - You still use `alvasta-pro daemon ...` in scripts
   - You need service lifecycle commands (install/start/stop/restart/status)
 title: "daemon"
 ---
 
-# `openclaw daemon`
+# `alvasta-pro daemon`
 
 Legacy alias for Gateway service management commands.
 
-`openclaw daemon ...` maps to the same service control surface as `openclaw gateway ...` service commands.
+`alvasta-pro daemon ...` maps to the same service control surface as `alvasta-pro gateway ...` service commands.
 
 ## Usage
 
 ```bash
-openclaw daemon status
-openclaw daemon install
-openclaw daemon start
-openclaw daemon stop
-openclaw daemon restart
-openclaw daemon uninstall
+alvasta-pro daemon status
+alvasta-pro daemon install
+alvasta-pro daemon start
+alvasta-pro daemon stop
+alvasta-pro daemon restart
+alvasta-pro daemon uninstall
 ```
 
 ## Subcommands
@@ -54,4 +54,4 @@ Notes:
 
 ## Prefer
 
-Use [`openclaw gateway`](/cli/gateway) for current docs and examples.
+Use [`alvasta-pro gateway`](/cli/gateway) for current docs and examples.

@@ -1,15 +1,15 @@
 ---
 title: "ComfyUI"
-summary: "ComfyUI workflow image, video, and music generation setup in OpenClaw"
+summary: "ComfyUI workflow image, video, and music generation setup in Alvasta Pro"
 read_when:
-  - You want to use local ComfyUI workflows with OpenClaw
+  - You want to use local ComfyUI workflows with Alvasta Pro
   - You want to use Comfy Cloud with image, video, or music workflows
   - You need the bundled comfy plugin config keys
 ---
 
 # ComfyUI
 
-OpenClaw ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
+Alvasta Pro ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
 
 - Provider: `comfy`
 - Models: `comfy/workflow`
@@ -26,7 +26,7 @@ OpenClaw ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
 - Music or audio generation through the shared `music_generate` tool
 - Output download from a configured node or all matching output nodes
 
-The bundled plugin is workflow-driven, so OpenClaw does not try to map generic
+The bundled plugin is workflow-driven, so Alvasta Pro does not try to map generic
 `size`, `aspectRatio`, `resolution`, `durationSeconds`, or TTS-style controls
 onto your graph.
 
@@ -102,7 +102,7 @@ Existing top-level image config still works:
 }
 ```
 
-OpenClaw treats that legacy shape as the image workflow config.
+Alvasta Pro treats that legacy shape as the image workflow config.
 
 ## Image workflows
 
@@ -157,7 +157,7 @@ Set the default video model:
 ```
 
 Comfy video workflows currently support text-to-video and image-to-video through
-the configured graph. OpenClaw does not pass input videos into Comfy workflows.
+the configured graph. Alvasta Pro does not pass input videos into Comfy workflows.
 
 ## Music workflows
 

@@ -1,19 +1,19 @@
 ---
-summary: "Run OpenClaw Gateway 24/7 on a GCP Compute Engine VM (Docker) with durable state"
+summary: "Run Alvasta Pro Gateway 24/7 on a GCP Compute Engine VM (Docker) with durable state"
 read_when:
-  - You want OpenClaw running 24/7 on GCP
+  - You want Alvasta Pro running 24/7 on GCP
   - You want a production-grade, always-on Gateway on your own VM
   - You want full control over persistence, binaries, and restart behavior
 title: "GCP"
 ---
 
-# OpenClaw on GCP Compute Engine (Docker, Production VPS Guide)
+# Alvasta Pro on GCP Compute Engine (Docker, Production VPS Guide)
 
 ## Goal
 
-Run a persistent OpenClaw Gateway on a GCP Compute Engine VM using Docker, with durable state, baked-in binaries, and safe restart behavior.
+Run a persistent Alvasta Pro Gateway on a GCP Compute Engine VM using Docker, with durable state, baked-in binaries, and safe restart behavior.
 
-If you want "OpenClaw 24/7 for ~$5-12/mo", this is a reliable setup on Google Cloud.
+If you want "Alvasta Pro 24/7 for ~$5-12/mo", this is a reliable setup on Google Cloud.
 Pricing varies by machine type and region; pick the smallest VM that fits your workload and scale up if you hit OOMs.
 
 ## What are we doing (simple terms)?
@@ -21,11 +21,11 @@ Pricing varies by machine type and region; pick the smallest VM that fits your w
 - Create a GCP project and enable billing
 - Create a Compute Engine VM
 - Install Docker (isolated app runtime)
-- Start the OpenClaw Gateway in Docker
-- Persist `~/.openclaw` + `~/.openclaw/workspace` on the host (survives restarts/rebuilds)
+- Start the Alvasta Pro Gateway in Docker
+- Persist `~/.alvasta-pro` + `~/.alvasta-pro/workspace` on the host (survives restarts/rebuilds)
 - Access the Control UI from your laptop via an SSH tunnel
 
-That mounted `~/.openclaw` state includes `openclaw.json`, per-agent
+That mounted `~/.alvasta-pro` state includes `alvasta-pro.json`, per-agent
 `agents/<agentId>/agent/auth-profiles.json`, and `.env`.
 
 The Gateway can be accessed via:
@@ -45,7 +45,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 2. Create Compute Engine VM (e2-small, Debian 12, 20GB)
 3. SSH into the VM
 4. Install Docker
-5. Clone OpenClaw repository
+5. Clone Alvasta Pro repository
 6. Create persistent host directories
 7. Configure `.env` and `docker-compose.yml`
 8. Bake required binaries, build, and launch
@@ -91,8 +91,8 @@ For the generic Docker flow, see [Docker](/install/docker).
     **CLI:**
 
     ```bash
-    gcloud projects create my-openclaw-project --name="OpenClaw Gateway"
-    gcloud config set project my-openclaw-project
+    gcloud projects create my-alvasta-pro-project --name="Alvasta Pro Gateway"
+    gcloud config set project my-alvasta-pro-project
     ```
 
     Enable billing at [https://console.cloud.google.com/billing](https://console.cloud.google.com/billing) (required for Compute Engine).
@@ -124,7 +124,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     **CLI:**
 
     ```bash
-    gcloud compute instances create openclaw-gateway \
+    gcloud compute instances create alvasta-pro-gateway \
       --zone=us-central1-a \
       --machine-type=e2-small \
       --boot-disk-size=20GB \
@@ -135,7 +135,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     **Console:**
 
     1. Go to Compute Engine > VM instances > Create instance
-    2. Name: `openclaw-gateway`
+    2. Name: `alvasta-pro-gateway`
     3. Region: `us-central1`, Zone: `us-central1-a`
     4. Machine type: `e2-small`
     5. Boot disk: Debian 12, 20GB
@@ -147,7 +147,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     **CLI:**
 
     ```bash
-    gcloud compute ssh openclaw-gateway --zone=us-central1-a
+    gcloud compute ssh alvasta-pro-gateway --zone=us-central1-a
     ```
 
     **Console:**
@@ -175,7 +175,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     Then SSH back in:
 
     ```bash
-    gcloud compute ssh openclaw-gateway --zone=us-central1-a
+    gcloud compute ssh alvasta-pro-gateway --zone=us-central1-a
     ```
 
     Verify:
@@ -187,10 +187,10 @@ For the generic Docker flow, see [Docker](/install/docker).
 
   </Step>
 
-  <Step title="Clone the OpenClaw repository">
+  <Step title="Clone the Alvasta Pro repository">
     ```bash
-    git clone https://github.com/openclaw/openclaw.git
-    cd openclaw
+    git clone https://github.com/alvasta-pro/alvasta-pro.git
+    cd alvasta-pro
     ```
 
     This guide assumes you will build a custom image to guarantee binary persistence.
@@ -202,8 +202,8 @@ For the generic Docker flow, see [Docker](/install/docker).
     All long-lived state must live on the host.
 
     ```bash
-    mkdir -p ~/.openclaw
-    mkdir -p ~/.openclaw/workspace
+    mkdir -p ~/.alvasta-pro
+    mkdir -p ~/.alvasta-pro/workspace
     ```
 
   </Step>
@@ -212,16 +212,16 @@ For the generic Docker flow, see [Docker](/install/docker).
     Create `.env` in the repository root.
 
     ```bash
-    OPENCLAW_IMAGE=openclaw:latest
+    OPENCLAW_IMAGE=alvasta-pro:latest
     OPENCLAW_GATEWAY_TOKEN=change-me-now
     OPENCLAW_GATEWAY_BIND=lan
     OPENCLAW_GATEWAY_PORT=18789
 
-    OPENCLAW_CONFIG_DIR=/home/$USER/.openclaw
-    OPENCLAW_WORKSPACE_DIR=/home/$USER/.openclaw/workspace
+    OPENCLAW_CONFIG_DIR=/home/$USER/.alvasta-pro
+    OPENCLAW_WORKSPACE_DIR=/home/$USER/.alvasta-pro/workspace
 
     GOG_KEYRING_PASSWORD=change-me-now
-    XDG_CONFIG_HOME=/home/node/.openclaw
+    XDG_CONFIG_HOME=/home/node/.alvasta-pro
     ```
 
     Generate strong secrets:
@@ -234,7 +234,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 
     This `.env` file is for container/runtime env such as `OPENCLAW_GATEWAY_TOKEN`.
     Stored provider OAuth/API-key auth lives in the mounted
-    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`.
+    `~/.alvasta-pro/agents/<agentId>/agent/auth-profiles.json`.
 
   </Step>
 
@@ -243,7 +243,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 
     ```yaml
     services:
-      openclaw-gateway:
+      alvasta-pro-gateway:
         image: ${OPENCLAW_IMAGE}
         build: .
         restart: unless-stopped
@@ -260,8 +260,8 @@ For the generic Docker flow, see [Docker](/install/docker).
           - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
           - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         volumes:
-          - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-          - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+          - ${OPENCLAW_CONFIG_DIR}:/home/node/.alvasta-pro
+          - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.alvasta-pro/workspace
         ports:
           # Recommended: keep the Gateway loopback-only on the VM; access via SSH tunnel.
           # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
@@ -299,7 +299,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     When binding to LAN (`OPENCLAW_GATEWAY_BIND=lan`), configure a trusted browser origin before continuing:
 
     ```bash
-    docker compose run --rm openclaw-cli config set gateway.controlUi.allowedOrigins '["http://127.0.0.1:18789"]' --strict-json
+    docker compose run --rm alvasta-pro-cli config set gateway.controlUi.allowedOrigins '["http://127.0.0.1:18789"]' --strict-json
     ```
 
     If you changed the gateway port, replace `18789` with your configured port.
@@ -310,7 +310,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     Create an SSH tunnel to forward the Gateway port:
 
     ```bash
-    gcloud compute ssh openclaw-gateway --zone=us-central1-a -- -L 18789:127.0.0.1:18789
+    gcloud compute ssh alvasta-pro-gateway --zone=us-central1-a -- -L 18789:127.0.0.1:18789
     ```
 
     Open in your browser:
@@ -320,7 +320,7 @@ For the generic Docker flow, see [Docker](/install/docker).
     Reprint a clean dashboard link:
 
     ```bash
-    docker compose run --rm openclaw-cli dashboard --no-open
+    docker compose run --rm alvasta-pro-cli dashboard --no-open
     ```
 
     If the UI prompts for shared-secret auth, paste the configured token or
@@ -331,8 +331,8 @@ For the generic Docker flow, see [Docker](/install/docker).
     If Control UI shows `unauthorized` or `disconnected (1008): pairing required`, approve the browser device:
 
     ```bash
-    docker compose run --rm openclaw-cli devices list
-    docker compose run --rm openclaw-cli devices approve <requestId>
+    docker compose run --rm alvasta-pro-cli devices list
+    docker compose run --rm alvasta-pro-cli devices approve <requestId>
     ```
 
     Need the shared persistence and update reference again?
@@ -365,15 +365,15 @@ If Docker build fails with `Killed` and `exit code 137`, the VM was OOM-killed. 
 
 ```bash
 # Stop the VM first
-gcloud compute instances stop openclaw-gateway --zone=us-central1-a
+gcloud compute instances stop alvasta-pro-gateway --zone=us-central1-a
 
 # Change machine type
-gcloud compute instances set-machine-type openclaw-gateway \
+gcloud compute instances set-machine-type alvasta-pro-gateway \
   --zone=us-central1-a \
   --machine-type=e2-small
 
 # Start the VM
-gcloud compute instances start openclaw-gateway --zone=us-central1-a
+gcloud compute instances start alvasta-pro-gateway --zone=us-central1-a
 ```
 
 ---
@@ -387,15 +387,15 @@ For automation or CI/CD pipelines, create a dedicated service account with minim
 1. Create a service account:
 
    ```bash
-   gcloud iam service-accounts create openclaw-deploy \
-     --display-name="OpenClaw Deployment"
+   gcloud iam service-accounts create alvasta-pro-deploy \
+     --display-name="Alvasta Pro Deployment"
    ```
 
 2. Grant Compute Instance Admin role (or narrower custom role):
 
    ```bash
-   gcloud projects add-iam-policy-binding my-openclaw-project \
-     --member="serviceAccount:openclaw-deploy@my-openclaw-project.iam.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding my-alvasta-pro-project \
+     --member="serviceAccount:alvasta-pro-deploy@my-alvasta-pro-project.iam.gserviceaccount.com" \
      --role="roles/compute.instanceAdmin.v1"
    ```
 

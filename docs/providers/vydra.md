@@ -1,7 +1,7 @@
 ---
-summary: "Use Vydra image, video, and speech in OpenClaw"
+summary: "Use Vydra image, video, and speech in Alvasta Pro"
 read_when:
-  - You want Vydra media generation in OpenClaw
+  - You want Vydra media generation in Alvasta Pro
   - You need Vydra API key setup guidance
 title: "Vydra"
 ---
@@ -14,7 +14,7 @@ The bundled Vydra plugin adds:
 - video generation via `vydra/veo3` and `vydra/kling`
 - speech synthesis via Vydra's ElevenLabs-backed TTS route
 
-OpenClaw uses the same `VYDRA_API_KEY` for all three capabilities.
+Alvasta Pro uses the same `VYDRA_API_KEY` for all three capabilities.
 
 ## Important base URL
 
@@ -27,7 +27,7 @@ Vydra's apex host (`https://vydra.ai/api/v1`) currently redirects to `www`. Some
 Interactive onboarding:
 
 ```bash
-openclaw onboard --auth-choice vydra-api-key
+alvasta-pro onboard --auth-choice vydra-api-key
 ```
 
 Or set the env var directly:
@@ -56,7 +56,7 @@ Set it as the default image provider:
 }
 ```
 
-Current bundled support is text-to-image only. Vydra's hosted edit routes expect remote image URLs, and OpenClaw does not add a Vydra-specific upload bridge in the bundled plugin yet.
+Current bundled support is text-to-image only. Vydra's hosted edit routes expect remote image URLs, and Alvasta Pro does not add a Vydra-specific upload bridge in the bundled plugin yet.
 
 See [Image Generation](/tools/image-generation) for shared tool behavior.
 

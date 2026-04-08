@@ -14,7 +14,7 @@ A **node** is a companion device (macOS/iOS/Android/headless) that connects to t
 Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL;
 historical only for current nodes).
 
-macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `openclaw nodes …` works against this Mac).
+macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `alvasta-pro nodes …` works against this Mac).
 
 Notes:
 
@@ -30,16 +30,16 @@ creates a device pairing request for `role: node`. Approve via the devices CLI (
 Quick CLI:
 
 ```bash
-openclaw devices list
-openclaw devices approve <requestId>
-openclaw devices reject <requestId>
-openclaw nodes status
-openclaw nodes describe --node <idOrNameOrIp>
+alvasta-pro devices list
+alvasta-pro devices approve <requestId>
+alvasta-pro devices reject <requestId>
+alvasta-pro nodes status
+alvasta-pro nodes describe --node <idOrNameOrIp>
 ```
 
 If a node retries with changed auth details (role/scopes/public key), the prior
 pending request is superseded and a new `requestId` is created. Re-run
-`openclaw devices list` before approving.
+`alvasta-pro devices list` before approving.
 
 Notes:
 
@@ -47,7 +47,7 @@ Notes:
 - The device pairing record is the durable approved-role contract. Token
   rotation stays inside that contract; it cannot upgrade a paired node into a
   different role that pairing approval never granted.
-- `node.pair.*` (CLI: `openclaw nodes pending/approve/reject/rename`) is a separate gateway-owned
+- `node.pair.*` (CLI: `alvasta-pro nodes pending/approve/reject/rename`) is a separate gateway-owned
   node pairing store; it does **not** gate the WS `connect` handshake.
 - Approval scope follows the pending request's declared commands:
   - commandless request: `operator.pairing`
@@ -64,14 +64,14 @@ forwards `exec` calls to the **node host** when `host=node` is selected.
 
 - **Gateway host**: receives messages, runs the model, routes tool calls.
 - **Node host**: executes `system.run`/`system.which` on the node machine.
-- **Approvals**: enforced on the node host via `~/.openclaw/exec-approvals.json`.
+- **Approvals**: enforced on the node host via `~/.alvasta-pro/exec-approvals.json`.
 
 Approval note:
 
 - Approval-backed node runs bind exact request context.
-- For direct shell/runtime file executions, OpenClaw also best-effort binds one concrete local
+- For direct shell/runtime file executions, Alvasta Pro also best-effort binds one concrete local
   file operand and denies the run if that file changes before execution.
-- If OpenClaw cannot identify exactly one concrete local file for an interpreter/runtime command,
+- If Alvasta Pro cannot identify exactly one concrete local file for an interpreter/runtime command,
   approval-backed execution is denied instead of pretending full runtime coverage. Use sandboxing,
   separate hosts, or an explicit trusted allowlist/full workflow for broader interpreter semantics.
 
@@ -80,7 +80,7 @@ Approval note:
 On the node machine:
 
 ```bash
-openclaw node run --host <gateway-host> --port 18789 --display-name "Build Node"
+alvasta-pro node run --host <gateway-host> --port 18789 --display-name "Build Node"
 ```
 
 ### Remote gateway via SSH tunnel (loopback bind)
@@ -97,12 +97,12 @@ ssh -N -L 18790:127.0.0.1:18789 user@gateway-host
 
 # Terminal B: export the gateway token and connect through the tunnel
 export OPENCLAW_GATEWAY_TOKEN="<gateway-token>"
-openclaw node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
+alvasta-pro node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
 ```
 
 Notes:
 
-- `openclaw node run` supports token or password auth.
+- `alvasta-pro node run` supports token or password auth.
 - Env vars are preferred: `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`.
 - Config fallback is `gateway.auth.token` / `gateway.auth.password`.
 - In local mode, node host intentionally ignores `gateway.remote.token` / `gateway.remote.password`.
@@ -113,8 +113,8 @@ Notes:
 ### Start a node host (service)
 
 ```bash
-openclaw node install --host <gateway-host> --port 18789 --display-name "Build Node"
-openclaw node restart
+alvasta-pro node install --host <gateway-host> --port 18789 --display-name "Build Node"
+alvasta-pro node restart
 ```
 
 ### Pair + name
@@ -122,38 +122,38 @@ openclaw node restart
 On the gateway host:
 
 ```bash
-openclaw devices list
-openclaw devices approve <requestId>
-openclaw nodes status
+alvasta-pro devices list
+alvasta-pro devices approve <requestId>
+alvasta-pro nodes status
 ```
 
-If the node retries with changed auth details, re-run `openclaw devices list`
+If the node retries with changed auth details, re-run `alvasta-pro devices list`
 and approve the current `requestId`.
 
 Naming options:
 
-- `--display-name` on `openclaw node run` / `openclaw node install` (persists in `~/.openclaw/node.json` on the node).
-- `openclaw nodes rename --node <id|name|ip> --name "Build Node"` (gateway override).
+- `--display-name` on `alvasta-pro node run` / `alvasta-pro node install` (persists in `~/.alvasta-pro/node.json` on the node).
+- `alvasta-pro nodes rename --node <id|name|ip> --name "Build Node"` (gateway override).
 
 ### Allowlist the commands
 
 Exec approvals are **per node host**. Add allowlist entries from the gateway:
 
 ```bash
-openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
-openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
+alvasta-pro approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
+alvasta-pro approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
 ```
 
-Approvals live on the node host at `~/.openclaw/exec-approvals.json`.
+Approvals live on the node host at `~/.alvasta-pro/exec-approvals.json`.
 
 ### Point exec at the node
 
 Configure defaults (gateway config):
 
 ```bash
-openclaw config set tools.exec.host node
-openclaw config set tools.exec.security allowlist
-openclaw config set tools.exec.node "<id-or-name>"
+alvasta-pro config set tools.exec.host node
+alvasta-pro config set tools.exec.security allowlist
+alvasta-pro config set tools.exec.node "<id-or-name>"
 ```
 
 Or per session:
@@ -178,7 +178,7 @@ Related:
 Low-level (raw RPC):
 
 ```bash
-openclaw nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
 Higher-level helpers exist for the common “give the agent a MEDIA attachment” workflows.
@@ -190,17 +190,17 @@ If the node is showing the Canvas (WebView), `canvas.snapshot` returns `{ format
 CLI helper (writes to a temp file and prints `MEDIA:<path>`):
 
 ```bash
-openclaw nodes canvas snapshot --node <idOrNameOrIp> --format png
-openclaw nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
+alvasta-pro nodes canvas snapshot --node <idOrNameOrIp> --format png
+alvasta-pro nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
 ```
 
 ### Canvas controls
 
 ```bash
-openclaw nodes canvas present --node <idOrNameOrIp> --target https://example.com
-openclaw nodes canvas hide --node <idOrNameOrIp>
-openclaw nodes canvas navigate https://example.com --node <idOrNameOrIp>
-openclaw nodes canvas eval --node <idOrNameOrIp> --js "document.title"
+alvasta-pro nodes canvas present --node <idOrNameOrIp> --target https://example.com
+alvasta-pro nodes canvas hide --node <idOrNameOrIp>
+alvasta-pro nodes canvas navigate https://example.com --node <idOrNameOrIp>
+alvasta-pro nodes canvas eval --node <idOrNameOrIp> --js "document.title"
 ```
 
 Notes:
@@ -211,9 +211,9 @@ Notes:
 ### A2UI (Canvas)
 
 ```bash
-openclaw nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
-openclaw nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
-openclaw nodes canvas a2ui reset --node <idOrNameOrIp>
+alvasta-pro nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
+alvasta-pro nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
+alvasta-pro nodes canvas a2ui reset --node <idOrNameOrIp>
 ```
 
 Notes:
@@ -225,16 +225,16 @@ Notes:
 Photos (`jpg`):
 
 ```bash
-openclaw nodes camera list --node <idOrNameOrIp>
-openclaw nodes camera snap --node <idOrNameOrIp>            # default: both facings (2 MEDIA lines)
-openclaw nodes camera snap --node <idOrNameOrIp> --facing front
+alvasta-pro nodes camera list --node <idOrNameOrIp>
+alvasta-pro nodes camera snap --node <idOrNameOrIp>            # default: both facings (2 MEDIA lines)
+alvasta-pro nodes camera snap --node <idOrNameOrIp> --facing front
 ```
 
 Video clips (`mp4`):
 
 ```bash
-openclaw nodes camera clip --node <idOrNameOrIp> --duration 10s
-openclaw nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
+alvasta-pro nodes camera clip --node <idOrNameOrIp> --duration 10s
+alvasta-pro nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 ```
 
 Notes:
@@ -248,8 +248,8 @@ Notes:
 Supported nodes expose `screen.record` (mp4). Example:
 
 ```bash
-openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
-openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
+alvasta-pro nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
+alvasta-pro nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
 ```
 
 Notes:
@@ -266,8 +266,8 @@ Nodes expose `location.get` when Location is enabled in settings.
 CLI helper:
 
 ```bash
-openclaw nodes location get --node <idOrNameOrIp>
-openclaw nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
+alvasta-pro nodes location get --node <idOrNameOrIp>
+alvasta-pro nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
 ```
 
 Notes:
@@ -283,7 +283,7 @@ Android nodes can expose `sms.send` when the user grants **SMS** permission and 
 Low-level invoke:
 
 ```bash
-openclaw nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from OpenClaw"}'
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from Alvasta Pro"}'
 ```
 
 Notes:
@@ -309,9 +309,9 @@ Available families:
 Example invokes:
 
 ```bash
-openclaw nodes invoke --node <idOrNameOrIp> --command device.status --params '{}'
-openclaw nodes invoke --node <idOrNameOrIp> --command notifications.list --params '{}'
-openclaw nodes invoke --node <idOrNameOrIp> --command photos.latest --params '{"limit":1}'
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command device.status --params '{}'
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command notifications.list --params '{}'
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command photos.latest --params '{"limit":1}'
 ```
 
 Notes:
@@ -326,8 +326,8 @@ The headless node host exposes `system.run`, `system.which`, and `system.execApp
 Examples:
 
 ```bash
-openclaw nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway ready"
-openclaw nodes invoke --node <idOrNameOrIp> --command system.which --params '{"name":"git"}'
+alvasta-pro nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway ready"
+alvasta-pro nodes invoke --node <idOrNameOrIp> --command system.which --params '{"name":"git"}'
 ```
 
 Notes:
@@ -348,7 +348,7 @@ Notes:
 - Node hosts ignore `PATH` overrides and strip dangerous startup/shell keys (`DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4`). If you need extra PATH entries, configure the node host service environment (or install tools in standard locations) instead of passing `PATH` via `--env`.
 - On macOS node mode, `system.run` is gated by exec approvals in the macOS app (Settings → Exec approvals).
   Ask/allowlist/full behave the same as the headless node host; denied prompts return `SYSTEM_RUN_DENIED`.
-- On headless node host, `system.run` is gated by exec approvals (`~/.openclaw/exec-approvals.json`).
+- On headless node host, `system.run` is gated by exec approvals (`~/.alvasta-pro/exec-approvals.json`).
 
 ## Exec node binding
 
@@ -358,21 +358,21 @@ This sets the default node for `exec host=node` (and can be overridden per agent
 Global default:
 
 ```bash
-openclaw config set tools.exec.node "node-id-or-name"
+alvasta-pro config set tools.exec.node "node-id-or-name"
 ```
 
 Per-agent override:
 
 ```bash
-openclaw config get agents.list
-openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
+alvasta-pro config get agents.list
+alvasta-pro config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
 Unset to allow any node:
 
 ```bash
-openclaw config unset tools.exec.node
-openclaw config unset agents.list[0].tools.exec.node
+alvasta-pro config unset tools.exec.node
+alvasta-pro config unset agents.list[0].tools.exec.node
 ```
 
 ## Permissions map
@@ -381,21 +381,21 @@ Nodes may include a `permissions` map in `node.list` / `node.describe`, keyed by
 
 ## Headless node host (cross-platform)
 
-OpenClaw can run a **headless node host** (no UI) that connects to the Gateway
+Alvasta Pro can run a **headless node host** (no UI) that connects to the Gateway
 WebSocket and exposes `system.run` / `system.which`. This is useful on Linux/Windows
 or for running a minimal node alongside a server.
 
 Start it:
 
 ```bash
-openclaw node run --host <gateway-host> --port 18789
+alvasta-pro node run --host <gateway-host> --port 18789
 ```
 
 Notes:
 
 - Pairing is still required (the Gateway will show a device pairing prompt).
-- The node host stores its node id, token, display name, and gateway connection info in `~/.openclaw/node.json`.
-- Exec approvals are enforced locally via `~/.openclaw/exec-approvals.json`
+- The node host stores its node id, token, display name, and gateway connection info in `~/.alvasta-pro/node.json`.
+- Exec approvals are enforced locally via `~/.alvasta-pro/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).
 - On macOS, the headless node host executes `system.run` locally by default. Set
   `OPENCLAW_NODE_EXEC_HOST=app` to route `system.run` through the companion app exec host; add
@@ -404,5 +404,5 @@ Notes:
 
 ## Mac node mode
 
-- The macOS menubar app connects to the Gateway WS server as a node (so `openclaw nodes …` works against this Mac).
+- The macOS menubar app connects to the Gateway WS server as a node (so `alvasta-pro nodes …` works against this Mac).
 - In remote mode, the app opens an SSH tunnel for the Gateway port and connects to `localhost`.

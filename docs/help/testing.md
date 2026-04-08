@@ -9,7 +9,7 @@ title: "Testing"
 
 # Testing
 
-OpenClaw has three Vitest suites (unit/integration, e2e, live) and a small set of Docker runners.
+Alvasta Pro has three Vitest suites (unit/integration, e2e, live) and a small set of Docker runners.
 
 This doc is a “how we test” guide:
 
@@ -62,7 +62,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
   - `pnpm test --watch` still uses the native root `vitest.config.ts` project graph, because a multi-shard watch loop is not practical.
   - `pnpm test`, `pnpm test:watch`, and `pnpm test:perf:imports` route explicit file/directory targets through scoped lanes first, so `pnpm test extensions/discord/src/monitor/message-handler.preflight.test.ts` avoids paying the full root project startup tax.
   - `pnpm test:changed` expands changed git paths into the same scoped lanes when the diff only touches routable source/test files; config/setup edits still fall back to the broad root-project rerun.
-  - Selected `plugin-sdk` and `commands` tests also route through dedicated light lanes that skip `test/setup-openclaw-runtime.ts`; stateful/runtime-heavy files stay on the existing lanes.
+  - Selected `plugin-sdk` and `commands` tests also route through dedicated light lanes that skip `test/setup-alvasta-pro-runtime.ts`; stateful/runtime-heavy files stay on the existing lanes.
   - Selected `plugin-sdk` and `commands` helper source files also map changed-mode runs to explicit sibling tests in those light lanes, so helper edits avoid rerunning the full heavy suite for that directory.
   - `auto-reply` now has three dedicated buckets: top-level core helpers, top-level `reply.*` integration tests, and the `src/auto-reply/reply/**` subtree. This keeps the heaviest reply harness work off the cheap status/chunk/token tests.
 - Embedded runner note:
@@ -123,7 +123,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 - Scope:
   - Starts an isolated OpenShell gateway on the host via Docker
   - Creates a sandbox from a temporary local Dockerfile
-  - Exercises OpenClaw's OpenShell backend over real `sandbox ssh-config` + SSH exec
+  - Exercises Alvasta Pro's OpenShell backend over real `sandbox ssh-config` + SSH exec
   - Verifies remote-canonical filesystem behavior through the sandbox fs bridge
 - Expectations:
   - Opt-in only; not part of the default `pnpm test:e2e` run
@@ -147,7 +147,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
   - Costs money / uses rate limits
   - Prefer running narrowed subsets instead of “everything”
 - Live runs source `~/.profile` to pick up missing API keys.
-- By default, live runs still isolate `HOME` and copy config/auth material into a temp test home so unit fixtures cannot mutate your real `~/.openclaw`.
+- By default, live runs still isolate `HOME` and copy config/auth material into a temp test home so unit fixtures cannot mutate your real `~/.alvasta-pro`.
 - Set `OPENCLAW_LIVE_USE_REAL_HOME=1` only when you intentionally need live tests to use your real home directory.
 - `pnpm test:live` now defaults to a quieter mode: it keeps `[live] ...` progress output, but suppresses the extra `~/.profile` notice and mutes gateway bootstrap logs/Bonjour chatter. Set `OPENCLAW_LIVE_TEST_QUIET=0` if you want the full startup logs back.
 - API key rotation (provider-specific): set `*_API_KEYS` with comma/semicolon format or `*_API_KEY_1`, `*_API_KEY_2` (for example `OPENAI_API_KEYS`, `ANTHROPIC_API_KEYS`, `GEMINI_API_KEYS`) or per-live override via `OPENCLAW_LIVE_*_KEY`; tests retry on rate limit responses.
@@ -212,7 +212,7 @@ Live tests are split into two layers so we can isolate failures:
   - Separates “provider API is broken / key is invalid” from “gateway agent pipeline is broken”
   - Contains small, isolated regressions (example: OpenAI Responses/Codex Responses reasoning replay + tool-call flows)
 
-### Layer 2: Gateway + dev agent smoke (what "@openclaw" actually does)
+### Layer 2: Gateway + dev agent smoke (what "@alvasta-pro" actually does)
 
 - Test: `src/gateway/gateway-models.profiles.live.test.ts`
 - Goal:
@@ -249,8 +249,8 @@ Live tests are split into two layers so we can isolate failures:
 Tip: to see what you can test on your machine (and the exact `provider/model` ids), run:
 
 ```bash
-openclaw models list
-openclaw models list --json
+alvasta-pro models list
+alvasta-pro models list --json
 ```
 
 ## Live: CLI backend smoke (Claude, Codex, Gemini, or other local CLIs)
@@ -299,7 +299,7 @@ Notes:
 
 - The Docker runner lives at `scripts/test-live-cli-backend-docker.sh`.
 - It runs the live CLI-backend smoke inside the repo Docker image as the non-root `node` user.
-- It resolves CLI smoke metadata from the owning extension, then installs the matching Linux CLI package (`@anthropic-ai/claude-code`, `@openai/codex`, or `@google/gemini-cli`) into a cached writable prefix at `OPENCLAW_DOCKER_CLI_TOOLS_DIR` (default: `~/.cache/openclaw/docker-cli-tools`).
+- It resolves CLI smoke metadata from the owning extension, then installs the matching Linux CLI package (`@anthropic-ai/claude-code`, `@openai/codex`, or `@google/gemini-cli`) into a cached writable prefix at `OPENCLAW_DOCKER_CLI_TOOLS_DIR` (default: `~/.cache/alvasta-pro/docker-cli-tools`).
 - The live CLI-backend smoke now exercises the same end-to-end flow for Claude, Codex, and Gemini: text turn, image classification turn, then MCP `cron` tool call verified through the gateway CLI.
 
 ## Live: ACP bind smoke (`/acp spawn ... --bind here`)
@@ -381,8 +381,8 @@ Notes:
 - `google-antigravity/...` uses the Antigravity OAuth bridge (Cloud Code Assist-style agent endpoint).
 - `google-gemini-cli/...` uses the local Gemini CLI on your machine (separate auth + tooling quirks).
 - Gemini API vs Gemini CLI:
-  - API: OpenClaw calls Google’s hosted Gemini API over HTTP (API key / profile auth); this is what most users mean by “Gemini”.
-  - CLI: OpenClaw shells out to a local `gemini` binary; it has its own auth and can behave differently (streaming/tool support/version skew).
+  - API: Alvasta Pro calls Google’s hosted Gemini API over HTTP (API key / profile auth); this is what most users mean by “Gemini”.
+  - CLI: Alvasta Pro shells out to a local `gemini` binary; it has its own auth and can behave differently (streaming/tool support/version skew).
 
 ## Live: model matrix (what we cover)
 
@@ -428,7 +428,7 @@ Include at least one image-capable model in `OPENCLAW_LIVE_GATEWAY_MODELS` (Clau
 
 If you have keys enabled, we also support testing via:
 
-- OpenRouter: `openrouter/...` (hundreds of models; use `openclaw models scan` to find tool+image capable candidates)
+- OpenRouter: `openrouter/...` (hundreds of models; use `alvasta-pro models scan` to find tool+image capable candidates)
 - OpenCode: `opencode/...` for Zen and `opencode-go/...` for Go (auth via `OPENCODE_API_KEY` / `OPENCODE_ZEN_API_KEY`)
 
 More providers you can include in the live matrix (if you have creds/config):
@@ -443,11 +443,11 @@ Tip: don’t try to hardcode “all models” in docs. The authoritative list is
 Live tests discover credentials the same way the CLI does. Practical implications:
 
 - If the CLI works, live tests should find the same keys.
-- If a live test says “no creds”, debug the same way you’d debug `openclaw models list` / model selection.
+- If a live test says “no creds”, debug the same way you’d debug `alvasta-pro models list` / model selection.
 
-- Per-agent auth profiles: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (this is what “profile keys” means in the live tests)
-- Config: `~/.openclaw/openclaw.json` (or `OPENCLAW_CONFIG_PATH`)
-- Legacy state dir: `~/.openclaw/credentials/` (copied into the staged live home when present, but not the main profile-key store)
+- Per-agent auth profiles: `~/.alvasta-pro/agents/<agentId>/agent/auth-profiles.json` (this is what “profile keys” means in the live tests)
+- Config: `~/.alvasta-pro/alvasta-pro.json` (or `OPENCLAW_CONFIG_PATH`)
+- Legacy state dir: `~/.alvasta-pro/credentials/` (copied into the staged live home when present, but not the main profile-key store)
 - Live local runs copy the active config, per-agent `auth-profiles.json` files, legacy `credentials/`, and supported external CLI auth dirs into a temp test home by default; `agents.*.workspace` / `agentDir` path overrides are stripped in that staged config so probes stay off your real host workspace.
 
 If you want to rely on env keys (e.g. exported in your `~/.profile`), run local tests after `source ~/.profile`, or use the Docker runners below (they can mount `~/.profile` into the container).
@@ -597,7 +597,7 @@ The live-model Docker runners also bind-mount the current checkout read-only and
 stage it into a temporary workdir inside the container. This keeps the runtime
 image slim while still running Vitest against your exact local source/config.
 The staging step skips large local-only caches and app build outputs such as
-`.pnpm-store`, `.worktrees`, `__openclaw_vitest__`, and app-local `.build` or
+`.pnpm-store`, `.worktrees`, `__alvasta-pro_vitest__`, and app-local `.build` or
 Gradle output directories so Docker live runs do not spend minutes copying
 machine-specific artifacts.
 They also set `OPENCLAW_SKIP_CHANNELS=1` so gateway live probes do not start
@@ -606,19 +606,19 @@ real Telegram/Discord/etc. channel workers inside the container.
 `OPENCLAW_LIVE_GATEWAY_*` as well when you need to narrow or exclude gateway
 live coverage from that Docker lane.
 `test:docker:openwebui` is a higher-level compatibility smoke: it starts an
-OpenClaw gateway container with the OpenAI-compatible HTTP endpoints enabled,
+Alvasta Pro gateway container with the OpenAI-compatible HTTP endpoints enabled,
 starts a pinned Open WebUI container against that gateway, signs in through
-Open WebUI, verifies `/api/models` exposes `openclaw/default`, then sends a
+Open WebUI, verifies `/api/models` exposes `alvasta-pro/default`, then sends a
 real chat request through Open WebUI's `/api/chat/completions` proxy.
 The first run can be noticeably slower because Docker may need to pull the
 Open WebUI image and Open WebUI may need to finish its own cold-start setup.
 This lane expects a usable live model key, and `OPENCLAW_PROFILE_FILE`
 (`~/.profile` by default) is the primary way to provide it in Dockerized runs.
 Successful runs print a small JSON payload like `{ "ok": true, "model":
-"openclaw/default", ... }`.
+"alvasta-pro/default", ... }`.
 `test:docker:mcp-channels` is intentionally deterministic and does not need a
 real Telegram, Discord, or iMessage account. It boots a seeded Gateway
-container, starts a second container that spawns `openclaw mcp serve`, then
+container, starts a second container that spawns `alvasta-pro mcp serve`, then
 verifies routed conversation discovery, transcript reads, attachment metadata,
 live event queue behavior, outbound send routing, and Claude-style channel +
 permission notifications over the real stdio MCP bridge. The notification check
@@ -632,10 +632,10 @@ Manual ACP plain-language thread smoke (not CI):
 
 Useful env vars:
 
-- `OPENCLAW_CONFIG_DIR=...` (default: `~/.openclaw`) mounted to `/home/node/.openclaw`
-- `OPENCLAW_WORKSPACE_DIR=...` (default: `~/.openclaw/workspace`) mounted to `/home/node/.openclaw/workspace`
+- `OPENCLAW_CONFIG_DIR=...` (default: `~/.alvasta-pro`) mounted to `/home/node/.alvasta-pro`
+- `OPENCLAW_WORKSPACE_DIR=...` (default: `~/.alvasta-pro/workspace`) mounted to `/home/node/.alvasta-pro/workspace`
 - `OPENCLAW_PROFILE_FILE=...` (default: `~/.profile`) mounted to `/home/node/.profile` and sourced before running tests
-- `OPENCLAW_DOCKER_CLI_TOOLS_DIR=...` (default: `~/.cache/openclaw/docker-cli-tools`) mounted to `/home/node/.npm-global` for cached CLI installs inside Docker
+- `OPENCLAW_DOCKER_CLI_TOOLS_DIR=...` (default: `~/.cache/alvasta-pro/docker-cli-tools`) mounted to `/home/node/.npm-global` for cached CLI installs inside Docker
 - External CLI auth dirs/files under `$HOME` are mounted read-only under `/host-auth...`, then copied into `/home/node/...` before tests start
   - Default dirs: `.minimax`
   - Default files: `~/.codex/auth.json`, `~/.codex/config.toml`, `.claude.json`, `~/.claude/.credentials.json`, `~/.claude/settings.json`, `~/.claude/settings.local.json`
