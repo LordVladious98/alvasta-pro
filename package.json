@@ -1,6 +1,6 @@
 {
   "name": "@alvasta/pro",
-  "version": "0.6.0-alpha.1",
+  "version": "2026.5.0-alvasta.1",
   "description": "The Claude-faithful personal AI assistant. Forked from openclaw, rewired to use Claude Code OAuth via subprocess. Built in Melbourne by Alvasta IT Solutions.",
   "keywords": ["claude", "claude-code", "alvasta", "personal-ai", "assistant", "openclaw-fork"],
   "homepage": "https://github.com/LordVladious98/alvasta-pro#readme",
