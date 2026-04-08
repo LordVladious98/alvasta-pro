@@ -25,6 +25,7 @@ import { listChannelAgentTools } from "./channel-tools.js";
 import { shouldSuppressManagedWebSearchTool } from "./codex-native-web-search.js";
 import { resolveImageSanitizationLimits } from "./image-sanitization.js";
 import type { ModelAuthMode } from "./model-auth.js";
+import { registerToolArray } from "./alvasta-bridge-openclaw-tools.js";
 import { createOpenClawTools } from "./openclaw-tools.js";
 import { wrapToolWithAbortSignal } from "./pi-tools.abort.js";
 import { wrapToolWithBeforeToolCallHook } from "./pi-tools.before-tool-call.js";
@@ -687,5 +688,19 @@ export function createOpenClawCodingTools(options?: {
   // NOTE: Keep canonical (lowercase) tool names here.
   // pi-ai's Anthropic OAuth transport remaps tool names to Claude Code-style names
   // on the wire and maps them back for tool dispatch.
+
+  // Alvasta Pro v0.7: side-effect register the tool array with the Alvasta
+  // MCP bridge so the spawned `claude --print` subprocess can call any
+  // openclaw native tool via MCP. Fire-and-forget, idempotent, zero-latency
+  // on the hot path. Gated on env var so standard openclaw installs stay
+  // unchanged; Alvasta Pro sets ALVASTA_BRIDGE=1 at startup.
+  if (process.env.ALVASTA_BRIDGE !== "0") {
+    try {
+      registerToolArray(withDeferredFollowupDescriptions as unknown as Parameters<typeof registerToolArray>[0]);
+    } catch {
+      // fire-and-forget — never break inference over bridge errors
+    }
+  }
+
   return withDeferredFollowupDescriptions;
 }

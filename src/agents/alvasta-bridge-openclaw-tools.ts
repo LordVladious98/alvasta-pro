@@ -161,37 +161,17 @@ function wrapTool(tool: AnyAgentTool): ToolHandler {
  * @returns the number of tools successfully bridged
  */
 export async function bridgeOpenclawTools(
-  createTools?: (options?: unknown) => AnyAgentTool[] | Promise<AnyAgentTool[]>,
+  createTools: (options?: unknown) => AnyAgentTool[] | Promise<AnyAgentTool[]>,
   toolOptions?: unknown,
 ): Promise<number> {
   const host = getAlvastaToolHost();
   await host.start();
 
-  let tools: AnyAgentTool[];
-  if (createTools) {
-    tools = await createTools(toolOptions);
-  } else {
-    // Dynamic import to avoid loading openclaw's full tool tree unless needed
-    try {
-      // @ts-expect-error — runtime import
-      const mod = await import("./openclaw-tools.js");
-      const fn = mod.createOpenClawTools as
-        | ((options?: unknown) => AnyAgentTool[])
-        | undefined;
-      if (typeof fn !== "function") {
-        console.warn("[alvasta] openclaw-tools.ts has no createOpenClawTools export");
-        return 0;
-      }
-      tools = fn(toolOptions);
-    } catch (e) {
-      console.warn(
-        `[alvasta] failed to import openclaw tools registry: ${
-          e instanceof Error ? e.message : String(e)
-        }`,
-      );
-      return 0;
-    }
-  }
+  // Caller must supply the factory. We don't dynamically import openclaw-tools.ts
+  // ourselves because pi-tools.ts already statically imports it, and openclaw's
+  // build guards treat mixed dynamic+static imports as errors. Use
+  // registerToolArray() instead if you have a pre-built tool array.
+  const tools = await createTools(toolOptions);
 
   let count = 0;
   for (const tool of tools) {
@@ -214,6 +194,53 @@ export async function bridgeOpenclawTools(
   }
 
   console.log(`[alvasta] bridged ${count} openclaw native tools to the MCP host`);
+  return count;
+}
+
+/**
+ * Synchronous fire-and-forget registration of an already-assembled tool
+ * array. Use this when the runtime has already called createOpenClawTools()
+ * and wants to expose those tools to the spawned claude --print subprocess
+ * via the Alvasta MCP bridge.
+ *
+ * Kicks off host.start() if needed (non-blocking — the host is lazy and
+ * very fast to spin up). Idempotent: re-calling with updated tools replaces
+ * the registrations.
+ *
+ * Wire point: src/agents/pi-tools.ts at the end of the tool assembly
+ * function, where openclaw's runtime has just built the tool array for
+ * the current agent turn.
+ */
+let bridgeStarted = false;
+export function registerToolArray(tools: AnyAgentTool[]): number {
+  const host = getAlvastaToolHost();
+  if (!bridgeStarted) {
+    bridgeStarted = true;
+    void host.start().catch((e) => {
+      bridgeStarted = false;
+      console.warn(
+        `[alvasta] tool host failed to start: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+      );
+    });
+  }
+
+  let count = 0;
+  for (const tool of tools) {
+    if (!tool || typeof tool.name !== "string") continue;
+    try {
+      const definition: ToolDefinition = {
+        name: `openclaw_${tool.name}`,
+        description: tool.description ?? tool.label ?? `OpenClaw native tool: ${tool.name}`,
+        inputSchema: typeBoxToJsonSchema(tool.parameters),
+      };
+      host.register(definition, wrapTool(tool));
+      count++;
+    } catch {
+      // fire-and-forget: skip bad tools silently
+    }
+  }
   return count;
 }
 
