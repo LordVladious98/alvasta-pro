@@ -1,6 +1,85 @@
 # Changelog
 
-Docs: https://docs.alvasta-pro.ai
+Docs: https://github.com/LordVladious98/alvasta-pro
+
+## 2026.5.0-alvasta.1 — 2026-04-08 (Alvasta Pro v1.0)
+
+Hard fork of openclaw 2026.4.6 with the Anthropic SDK call path replaced by
+a Claude Code subprocess transport. Every `anthropic-messages` inference in
+the runtime now spawns `claude --print` as a child process, using the user's
+existing Claude Code OAuth token from their keychain. No API keys.
+
+### Changes
+
+- Transport: new `claude-code-transport-stream.ts` replaces the Anthropic SDK
+  path with `claude --print --input-format=stream-json --output-format=stream-json --verbose --dangerously-skip-permissions`.
+  Stream events are translated to openclaw's expected format (text_start,
+  text_delta, toolcall_start, toolcall_delta, done). Real usage/cost reported
+  from Anthropic billing. Session resume via `context.metadata.claudeSessionId`.
+- Tool host: new `alvasta-tool-host.ts` runs an HTTP server in the runtime
+  process that exposes openclaw's native tools to the spawned claude subprocess
+  via a per-process secret in the URL path. Writes a JSON manifest with
+  per-tool callback URLs.
+- MCP bridge: new `alvasta-mcp-bridge.mjs` is a stdio MCP server the spawned
+  claude subprocess loads via `--mcp-config`. Reads the manifest, exposes
+  tools via the MCP protocol, routes `tools/call` requests back to the
+  openclaw runtime via HTTP POST to the callback URLs.
+- Bridge adapter: new `alvasta-bridge-openclaw-tools.ts` converts openclaw's
+  `AnyAgentTool[]` (from `createOpenClawTools()`) to the tool host's
+  `ToolDefinition + ToolHandler` shape. Generates MCP-compatible input schemas
+  from TypeBox parameters and wraps `tool.execute()` as a host handler.
+- Wiring: `provider-transport-stream.ts` now routes the `anthropic-messages`
+  case through `createClaudeCodeTransportStreamFn()`. `pi-tools.ts` calls
+  `registerToolArray()` at the end of the tool assembly function so every
+  agent turn auto-registers the current tool set with the bridge.
+- CLI banner: `⚡ Alvasta Pro` replaces `🦞 OpenClaw`. Taglines rewritten
+  without lobster/crab/claw jokes — 9 regular taglines + 1 Christmas tagline
+  + the DEFAULT_TAGLINE updated.
+- Docs rebrand: 7,106 OpenClaw/openclaw mentions across 553 markdown files
+  under `docs/`, `skills/`, `extensions/`, plus top-level `SECURITY.md`,
+  `CHANGELOG.md`, `CONTRIBUTING.md` replaced with Alvasta Pro / alvasta-pro.
+  `LICENSE` file preserved untouched (MIT requires original copyright).
+- Daemon labels: added `ALVASTA_PRO_GATEWAY_*` / `ALVASTA_PRO_NODE_*` constants
+  in `src/daemon/constants.ts` for future wiring. Canonical daemon names still
+  use openclaw to avoid breaking ~20 test files that hardcode them.
+- README replaced with Alvasta Pro-specific content (architecture diagram,
+  status table, install instructions, relationship to alvasta-gateway sibling
+  project).
+- Install script: `install.sh` clones, builds, and smoke-tests in one
+  shell command. Verifies Node 22.12+, pnpm, and (optionally) Claude Code.
+- Version: bumped to `2026.5.0-alvasta.1` so bundled plugins' `>=2026.4.6`
+  compatibility constraint passes. The `-alvasta.1` suffix identifies the
+  fork's prerelease track.
+
+### Deferred to v1.1+
+
+- `OpenClawConfig` TypeScript type identifier not renamed (1,308 files,
+  zero user visibility, high cascade risk).
+- `OPENCLAW_*` environment variables not renamed (user-facing, backward
+  compat layer is possible but adds complexity).
+- Daemon service labels (`openclaw-gateway`, `ai.openclaw.gateway`, etc.)
+  not renamed — would orphan installed services. Alternate Alvasta Pro
+  constants are exported for future wiring.
+- npm publish (pnpm prepack fails on ARM64 because amazon-bedrock plugin
+  lacks arm64 prebuilds). v1.0 ships as a git-clone install via
+  `install.sh`.
+- Cross-platform verification on Windows and macOS (only Linux ARM64
+  tested on this release).
+
+### Tests
+
+Six contract tests verify the transport wiring end-to-end on Linux ARM64:
+- `test-transport.ts` (v0.1) — text-in/text-out
+- `test-transport-v2.ts` (v0.2) — stream-json, tool events, real usage
+- `test-transport-v3.ts` (v0.3) — MCP bridge with stub tools
+- `test-transport-v4.ts` (v0.4) — live tool host via HTTP callback
+- `test-transport-v5.ts` (v0.5) — openclaw tool registry adapter
+- `test-transport-v7.ts` (v0.7) — provider-transport-stream integration point
+
+All passing. Gateway also boots cleanly (`openclaw gateway run --port 19001`)
+with 6 plugins loaded and no compatibility warnings.
+
+---
 
 ## Unreleased
 
